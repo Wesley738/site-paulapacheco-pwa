@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitoramento de Rotina</title>
+  
+  <link rel="icon" href="favicon.ico" type="image/x-icon">
+  <link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32">
+  <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+  <link rel="stylesheet" href="styles.css">
+
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#000000"/>
+  <script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js')
+        .then(registration => {
+          console.log('Service Worker registrado!', registration);
+        });
+    });
+  }
+</script>
+
+</head>
+<body>
+  <!-- Barra Superior Fixa -->
+  <header class="barra-superior">
+    <div class="logo-container">
+      <img src="logo.png" alt="Logo da Empresa" class="logo">
+      <!-- Ou use texto se preferir -->
+      <!-- <h1 class="logo-texto">Nome da Empresa</h1> -->
+    </div>
+  </header>
+  <section id="metas">
+    <h1>📋 Metas Semanais</h1>
+
+    <!-- Caixa de Instruções (nova) -->
+    <div class="caixa-instrucoes">
+      <p>📌 <strong>Como usar:</strong> Defina metas semanais para cada pilar e clique no botão + para adicionar. Quando realizar a meta, marque concluído. 
+      Clique no ícone ✏️ para editar ou 🗑️ para excluir.</p>
+    </div>
+    
+    <!-- Input Nova Meta + Dropdown Pilar -->
+    <div class="adicionar-meta">
+      <input type="text" id="nova-meta" placeholder="Ex: Meditar 15 min/dia">
+      <select id="pilar">
+        <option value="saude-fisica">💪 Saúde Física</option>
+        <option value="saude-espiritual">🧘 Saúde Espiritual</option>
+        <option value="estudos">📚 Estudos</option>
+        <option value="familia">👨‍👩‍👧‍👦 Relacionamentos</option>
+        <option value="trabalho">💼 Trabalho</option>
+      </select>
+      <button id="btn-adicionar">+</button>
+    </div>
+
+    <!-- Lista de Metas -->
+    <div class="lista-metas">
+      <!-- Dinâmico (gerado via JavaScript) -->
+    </div>
+    <div class="limpar-container">
+        <button id="limpar-concluidas">🗑️ Limpar Concluídas</button>
+    </div>
+  </section>
+  <section id="prioridades" style="display: none;">
+    <h1>🎯 Comece seu dia com Clareza</h1>
+    <div class="caixa-instrucoes">
+      <p>📌 <strong>Como usar:</strong> Defina prioridades, ou seja, atividades que não pode deixar de realizar no dia.
+      Clique no ícone ✅ para confirmar a prioridade. Se quiser editar, clique no ícone ✏️.
+      Abaixo, descreva uma atitude difícil que tomou, quer fazer algo ou deixar de fazer algo</p>
+    </div>
+    <div class="prioridade-container">
+        <!-- Prioridade 1 -->
+        <div class="prioridade-item">
+          <span class="numero-prioridade">1</span>
+          <input type="text" placeholder="Prioridade #1" class="input-prioridade" id="prioridade-1">
+          <div class="acoes-prioridade">
+            <button class="btn-concluir">✅</button>
+            <button class="btn-editar" style="display: none;">✏️</button>
+          </div>
+        </div>
+        
+        <!-- Prioridade 2 -->
+        <div class="prioridade-item">
+          <span class="numero-prioridade">2</span>
+          <input type="text" placeholder="Prioridade #2" class="input-prioridade" id="prioridade-2">
+          <div class="acoes-prioridade">
+            <button class="btn-concluir">✅</button>
+            <button class="btn-editar" style="display: none;">✏️</button>
+          </div>
+        </div>
+        
+        <!-- Prioridade 3 -->
+        <div class="prioridade-item">
+          <span class="numero-prioridade">3</span>
+          <input type="text" placeholder="Prioridade #3" class="input-prioridade" id="prioridade-3">
+          <div class="acoes-prioridade">
+            <button class="btn-concluir">✅</button>
+            <button class="btn-editar" style="display: none;">✏️</button>
+          </div>
+        </div>
+        
+        <!-- Ato Heróico -->
+        <div class="ato-heroico">
+            <h3>🏆 Ato Heróico de Hoje</h3>
+            <textarea placeholder="O que você fez de extraordinário hoje?"></textarea>
+        </div>
+    </div>
+  </section>
+  <section id="checklist" style="display: none;">
+    <h1>✅ Checklist Diário</h1>
+    <div class="caixa-instrucoes">
+      <p>📌 <strong>Como usar:</strong> Defina atividades a serem realizadas no seu dia e clique em "Adicionar Tarefa". Há atividades de exemplo, mas pode editar ou apagar se quiser.
+      Clique na caixinha cinza quando concluir. Se quiser editar a atividade clique no ícone ✏️. Se quiser apagar, clique no ícone 🗑️</p>
+    </div>
+    <div class="checklist-container">
+      <ul class="tarefas-lista" id="lista-tarefas">
+        <!-- Dinâmico via JS -->
+      </ul>
+      
+      <div class="acoes-checklist">
+        <button id="btn-add-tarefa">➕ Adicionar Tarefa</button>
+        <button id="btn-limpar-concluidas">🗑️ Limpar Concluídas</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Seção Reflexão -->
+  <section id="reflexao">
+    <h1>💭 Reflexão Diária</h1>
+    <div class="caixa-instrucoes">
+      <p>📌 <strong>Como usar:</strong> Lembre de coisas que gostaria de agradecer no dia. Abaixo, defina acertos e erros do dia, pontos que deve melhorar, hábitos que deve manter e assim por diante.
+      Quando preencher, clique em ✅ Concluído. Se quiser editar, clique em ✏️ Editar. 
+      Quando terminar de preencher as caixas clique em "💯 Concluir Diagnóstico", então será gerado um diagnóstico do dia abaixo, onde pode sempre rever futuramente.
+    Para apagar os diagnósticos gerados e dar espaço a outros, clique no botão 💣
+  IMPORTANTE: Para poupar espaço de memória, é interessante que apague periódicamente (Ex: de 30 em 30 dias)</p>
+    </div>
+    <div class="diagnostico-caixa">
+      <div class="diagnostico-cabecalho">
+        <h2>🙏 Agradecimentos</h2>
+        <div class="diagnostico-botoes">
+          <!-- Botão de Concluir VISÍVEL por padrão -->
+          <button class="btn-concluir-diagnostico">✅ Concluído</button>
+          <!-- Botão de Editar OCULTO por padrão -->
+          <button class="btn-editar-diagnostico" style="display: none;">✏️ Editar</button>
+        </div>
+      </div>
+      <textarea id="agradecimentos" placeholder="Pelo que você é grato hoje?"></textarea>
+    </div>
+
+    <div class="diagnostico-caixa">
+      <div class="diagnostico-cabecalho">
+        <h2>🔍 Pontos Fortes e Fracos</h2>
+        <div class="diagnostico-botoes">
+          <!-- Botão de Concluir VISÍVEL por padrão -->
+          <button class="btn-concluir-diagnostico">✅ Concluído</button>
+          <!-- Botão de Editar OCULTO por padrão -->
+          <button class="btn-editar-diagnostico" style="display: none;">✏️ Editar</button>
+        </div>
+      </div>
+      <textarea id="melhorias" placeholder="O que fiz de Bom? O que fiz de Ruim? O que posso melhorar amanhã?"></textarea>
+    </div>
+
+    <div class="diagnostico-acoes">
+      <button id="btn-finalizar-diagnostico">💯 Concluir Diagnóstico</button>
+    </div>
+
+    <!-- Botão Flutuante Limpar Tudo -->
+    <button id="btn-nuclear" title="Zerar diagnósticos">💣</button>
+
+    <!-- Container de Relatórios -->
+    <div id="container-relatorios">
+      <!-- Os relatórios serão gerados aqui dinamicamente -->
+    </div>
+  </section>
+
+  <!-- Barra de Navegação (Instagram Style) -->
+    <nav class="nav-inferior">
+        <a href="#metas" class="nav-item">
+            <span>📅</span>
+            <span class="nav-texto">Metas Semanais</span>
+        </a>
+        <a href="#prioridades" class="nav-item">
+            <span>🎯</span>
+            <span class="nav-texto">Prioridades</span>
+        </a>
+        <a href="#checklist" class="nav-item">
+            <span>✅</span>
+            <span class="nav-texto">Checklist Diário</span>
+        </a>
+        <a href="#reflexao" class="nav-item">
+            <span>💭</span>
+            <span class="nav-texto">Reflexão</span>
+        </a>
+    </nav>
+  <script src="script.js"></script>
+</body>
+</html>

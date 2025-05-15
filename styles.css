@@ -1,0 +1,800 @@
+/* Reset e Estilos Gerais */
+body {
+  font-family: 'Arial', sans-serif;
+  background: #f9f9f9;
+  padding: 20px;
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 0;
+}
+
+h1 {
+  color: #643a02; /* Roxo profundo */
+  font-size: 2.2rem;
+  margin: 20px 0;
+  text-align: center;
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Efeito de sublinhado criativo */
+h1::after {
+  content: "";
+  display: block;
+  width: 60px;
+  height: 4px;
+  background: #c28400; /* Azul vibrante */
+  margin: 8px auto 0;
+  border-radius: 2px;
+}
+
+/* Opção com emoji (se quiser) */
+h1::before {
+  font-size: 1.8rem;
+}
+
+@media (max-width: 600px) {
+  h1 {
+    font-size: 1.8rem;
+  }
+  h1::before {
+    font-size: 1.5rem;
+  }
+}
+
+:root {
+  --cor-primaria: #694605; /* Azul vibrante */
+  --cor-secundaria: #b35e18; /* Azul mais escuro */
+  --fundo: #fff0de; /* Cinza clarinho */
+  --texto: #2b2d42; /* Quase preto */
+  --destaque: #dda200; /* Roxo pra highlights */
+  --z-index-nav: 100;  /* Camada baixa */
+  --z-index-botao: 101; /* Camada média */
+  --z-index-modal: 1000; /* Camada alta (para futuros modais) */
+}
+
+/* Scrollbar vertical */
+::-webkit-scrollbar {
+  width: 10px; /* Largura da barra */
+}
+
+::-webkit-scrollbar-track {
+  background: transparent; /* Fundo transparente */
+}
+
+::-webkit-scrollbar-thumb {
+  background: #8341138a; /* Marrom clássico */
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A0522D; /* Marrom mais escuro no hover */
+}
+
+/* Scrollbar horizontal (caso use) */
+::-webkit-scrollbar:horizontal {
+  height: 8px;
+}
+
+/* --- BARRA SUPERIOR --- */
+.barra-superior {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 65px;
+  background: white;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* Garante que fique acima de tudo */
+}
+
+.logo-container {
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.logo {
+  height: 60px; /* Ajuste conforme necessário */
+  width: auto;
+  max-width: 200px;
+}
+
+/* Se optar por texto ao invés de imagem */
+.logo-texto {
+  color: #4361ee;
+  font-size: 1.5rem;
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Ajuste de conteúdo para não ficar atrás da barra */
+body {
+  padding-top: 60px !important;
+}
+
+/* Seções - garantindo que não sejam cobertas */
+section {
+  margin-top: 20px;
+}
+
+/* Input + Dropdown */
+.adicionar-meta {
+  flex-direction: column; /* Empilha em telas pequenas */
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .adicionar-meta {
+    flex-direction: row; /* Volta pro lado em telas maiores */
+  }
+}
+
+/* Navbar Inferior - Instagram Style */
+.nav-inferior {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  width: 100%;
+  background: white;
+  display: flex;
+  justify-content: space-around;
+  padding: 10px 0;
+  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+  z-index: var(--z-index-nav);
+  border-top: 1px solid #f0f0f0;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  color: #555;
+  font-size: 0.9rem;
+  gap: 4px;
+  transition: all 0.3s ease;
+}
+
+.nav-item span:first-child {
+  font-size: 1.5rem;
+}
+
+.nav-item.ativo {
+  color: #915200; /* Cor azul do tema */
+  font-weight: 750; /* Adiciona negrito */
+  text-shadow: 0 1px 1px rgba(0,0,0,0.1);
+}
+
+.nav-texto {
+  font-size: 0.8rem;
+}
+
+/* Efeito hover suave */
+.nav-item:hover {
+  transform: translateY(-3px);
+  transition: all 0.2s;
+}
+
+/* Indicador visual da aba ativa */
+.nav-item.ativo::after {
+  content: "";
+  display: block;
+  width: 8px;
+  height: 8px;
+  background: #915200;
+  border-radius: 50%;
+  margin-top: 2px;
+}
+
+/* Ajuste de padding no body pra navbar não cobrir conteúdo */
+body {
+  padding-bottom: 70px !important;
+}
+
+#nova-meta {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+}
+
+#pilar {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background: white;
+}
+
+#btn-adicionar {
+  background: #df9b1d;
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 2px 15px;
+  cursor: pointer;
+  font-size: 23px;
+}
+
+/* Lista de Metas */
+.lista-metas {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.pilar-container {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  box-shadow: 
+    0 4px 6px rgba(0, 0, 0, 0.05),
+    0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  border-left: 4px solid var(--cor-primaria); /* Bordão lateral colorido */
+}
+
+.pilar-titulo {
+  font-weight: 800;
+  margin-bottom: 12px;
+  color: var(--cor-secundaria);
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.meta-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.meta-item:hover {
+  background: #f0f0f0;
+}
+
+/* Estilo quando a meta está concluída */
+.meta-item.concluida .texto-meta {
+  text-decoration: line-through;
+  opacity: 0.7;
+  color: #777;
+}
+
+/* Botões de Ação */
+.acoes-meta {
+  display: flex;
+  gap: 5px;
+}
+
+.btn-editar, .btn-deletar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.btn-editar:hover {
+  color: #3498db;
+}
+
+.btn-deletar:hover {
+  color: #e74c3c;
+}
+
+.texto-meta {
+  flex: 1;
+}
+
+/* CHECKBOX - REGRAS DEFINITIVAS (substitua tudo que tem sobre checkbox) */
+.checkbox-container {
+  display: inline-block;
+  position: relative;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  user-select: none;
+}
+
+/* Esconde o checkbox padrão */
+.checkbox-container input {
+  position: absolute;
+  opacity: 0;
+  cursor: pointer;
+  height: 0;
+  width: 0;
+}
+
+/* Checkbox personalizado */
+.checkmark {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  background-color: #dddcdc;
+  border-radius: 4px;
+  transition: all 0.2s;
+  box-shadow: inset 0 0 2px rgba(0,0,0,0.1);
+}
+
+/* Estilo quando marcado */
+.checkbox-container input:checked ~ .checkmark {
+  background-color: #2ecc71;
+}
+
+/* Checkmark (✔) - VISÍVEL APENAS QUANDO MARCADO */
+.checkmark:after {
+  content: "";
+  position: absolute;
+  display: none;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-container input:checked ~ .checkmark:after {
+  display: block;
+}
+
+/* Efeito hover */
+.checkbox-container:hover input ~ .checkmark {
+  background-color: #c7c7c7;
+}
+
+.checkbox-container:hover input:checked ~ .checkmark {
+  background-color: #27ae60;
+}
+
+/* Estilo do Botão */
+.limpar-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding-bottom: 20px; /* Apenas espaço interno */
+  position: static;
+  z-index: auto;
+}
+
+/* Botão fixo melhorado */
+#limpar-concluidas {
+  /* Estilos básicos */
+  background: #f8f9fa;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+  padding: 8px 15px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+
+  /* Posicionamento INVENCÍVEL */
+  position: fixed;
+  right: 20px;
+  bottom: 80px; /* Altura navbar + margem */
+  z-index: var(--z-index-botao); /* Nível atômico */
+  
+  pointer-events: auto;
+  transform: translate3d(0,0,0);
+
+  /* Garantia contra browsers */
+  will-change: transform;
+}
+
+/* Efeitos hover (mantidos) */
+#limpar-concluidas:hover {
+  background: #e74c3c;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3);
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  #limpar-concluidas {
+    bottom: 70px;
+    right: 15px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .nav-inferior {
+    height: 55px; /* Ajuste fino se necessário */
+  }
+}
+
+/* --- ESTILOS DAS PRIORIDADES --- */
+#prioridades {
+  padding-bottom: 80px; /* Espaço pra navbar */
+}
+
+.prioridade-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.prioridade-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.numero-prioridade {
+  background: #aa6600;
+  color: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+}
+
+.input-prioridade {
+  flex: 1;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+}
+
+.ato-heroico {
+  margin-top: 25px;
+}
+
+.ato-heroico h3 {
+  color: #aa6600;
+  margin-bottom: 10px;
+  font-size: 1.5rem;
+}
+
+.ato-heroico textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: 'Arial', sans-serif;
+  resize: vertical;
+  font-size: 1rem;
+}
+
+/* Container de botões */
+.acoes-prioridade {
+  display: flex;
+  gap: 5px;
+  margin-left: 10px;
+}
+
+/* Estilo dos botões */
+.btn-concluir, .btn-editar {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.2s;
+}
+
+.btn-concluir:hover {
+  transform: scale(1.1);
+  color: #2ecc71;
+}
+
+.btn-editar:hover {
+  transform: scale(1.1);
+  color: #3498db;
+}
+
+/* Input bloqueado */
+.input-prioridade.bloqueado {
+  background-color: #f5f5f5;
+  color: #777;
+  border-color: #e0e0e0;
+  pointer-events: none;
+}
+
+/* -- CHECKLIST UNIFICADA -- */
+.checklist-container {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-top: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.tarefas-lista {
+  list-style: none;
+  padding: 0;
+  margin-bottom: 20px;
+}
+
+.tarefa-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.tarefa-item.concluida .tarefa-texto {
+  text-decoration: line-through;
+  opacity: 0.7;
+  color: #777;
+}
+
+/* Botões de ação */
+.tarefa-acoes {
+  display: flex;
+  gap: 5px;
+  margin-left: auto;
+}
+
+.btn-editar-tarefa, 
+.btn-excluir-tarefa {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  opacity: 0.7;
+  transition: all 0.2s;
+}
+
+.btn-editar-tarefa:hover { color: #3498db; opacity: 1; }
+.btn-excluir-tarefa:hover { color: #e74c3c; opacity: 1; }
+
+/* Botões principais */
+.acoes-checklist {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+#btn-add-tarefa, #btn-limpar-concluidas {
+  padding: 8px 15px;
+  border-radius: 20px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s;
+}
+
+#btn-add-tarefa {
+  background: #4361ee;
+  color: white;
+}
+
+#btn-limpar-concluidas {
+  background: #f8f9fa;
+  border: 1px solid #e74c3c;
+  color: #e74c3c;
+}
+
+/* --- DIAGNÓSTICO --- */
+.diagnostico-caixa {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.diagnostico-cabecalho {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.diagnostico-cabecalho h2 {
+  color: #a36c06;
+  font-size: 1.2rem;
+  margin: 0;
+}
+
+.diagnostico-botoes {
+  display: flex;
+  gap: 10px;
+}
+
+.diagnostico-caixa textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: 'Arial', sans-serif;
+  resize: vertical;
+}
+
+/* Botões */
+.btn-editar-diagnostico, 
+.btn-concluir-diagnostico {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 5px 10px;
+  border-radius: 5px;
+  transition: all 0.2s;
+}
+
+.btn-concluir-diagnostico {
+  background: #2ecc71 !important;
+  color: white !important;
+  border: none !important;
+}
+
+.btn-editar-diagnostico {
+  background: #3498db !important;
+  color: white !important;
+  border: none !important;
+}
+
+.btn-editar-diagnostico:hover {
+  background: #3498db;
+  color: white;
+}
+
+.btn-concluir-diagnostico:hover {
+  background: #2ecc71;
+  color: white;
+}
+
+/* Botão Final */
+#btn-finalizar-diagnostico {
+  background: #b45904;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 30px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  display: block;
+  margin: 30px auto;
+  transition: all 0.3s;
+}
+
+#btn-finalizar-diagnostico:hover {
+  background: #c57103;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(114, 9, 183, 0.3);
+}
+
+#btn-nuclear {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  transition: all 0.3s;
+}
+
+#btn-nuclear:hover {
+  background: #c0392b;
+  transform: scale(1.1);
+}
+
+/* --- Container de Relatórios --- */
+#container-relatorios {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.relatorio {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  border-left: 4px solid #7c5202; /* Borda lateral azul */
+}
+
+.relatorio-titulo {
+  color: #2b2d42;
+  font-size: 1.1rem;
+  margin-top: 0;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.relatorio-item h4 {
+  color: #c27604;
+  font-size: 0.95rem;
+  margin-bottom: 5px;
+}
+
+.relatorio-item p {
+  background: #f8f9fa;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 5px;
+  line-height: 1.5;
+  font-size: 0.9rem;
+}
+
+/* Efeito hover (opcional) */
+.relatorio:hover {
+  transform: translateY(-2px);
+  transition: all 0.3s;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+/* Ícones nos títulos (opcional) */
+.relatorio-titulo::before {
+  content: "📅 ";
+}
+
+.relatorio-item h4::before {
+  content: "• ";
+  color: #d68e08;
+}
+
+/* Modo grade (opcional) */
+@media (min-width: 768px) {
+  #container-relatorios {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+  }
+}
+
+/* --- CAIXA DE INSTRUÇÕES --- */
+.caixa-instrucoes {
+  background: #f0f7ff; /* Fundo azul clarinho */
+  border-left: 4px solid #9e4903; /* Borda lateral azul */
+  border-radius: 0 8px 8px 0; /* Arredonda apenas o lado direito */
+  padding: 12px 15px;
+  margin: 5px 0 20px 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+.caixa-instrucoes p {
+  margin: 0;
+  color: #2b2d42;
+}
+
+.caixa-instrucoes strong {
+  color: #bd7202;
+}
+
