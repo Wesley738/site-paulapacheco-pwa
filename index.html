@@ -35,33 +35,66 @@
     </div>
   </header>
   <section id="metas">
-    <h1>📋 Metas Semanais</h1>
+    <h1>📋 Metas Gerais</h1>
 
-    <!-- Caixa de Instruções (nova) -->
     <div class="caixa-instrucoes">
-      <p>📌 <strong>Como usar:</strong> Defina metas semanais para cada pilar e clique no botão + para adicionar. Quando realizar a meta, marque concluído. 
-      Clique no ícone ✏️ para editar ou 🗑️ para excluir.</p>
+      <p>📌 <strong>Como usar:</strong> Defina metas para cada período e pilar. Quando realizar a meta, marque concluído. 
+      Clique em ✏️ para editar ou 🗑️ para excluir.</p>
     </div>
     
-    <!-- Input Nova Meta + Dropdown Pilar -->
+    <!-- Formulário para adicionar nova meta -->
     <div class="adicionar-meta">
       <input type="text" id="nova-meta" placeholder="Ex: Meditar 15 min/dia">
-      <select id="pilar">
-        <option value="saude-fisica">💪 Saúde Física</option>
-        <option value="saude-espiritual">🧘 Saúde Espiritual</option>
-        <option value="estudos">📚 Estudos</option>
-        <option value="familia">👨‍👩‍👧‍👦 Relacionamentos</option>
-        <option value="trabalho">💼 Trabalho</option>
-      </select>
+      
+      <div class="seletores-container">
+        <select id="pilar">
+          <option value="saude-fisica">💪 Saúde Física</option>
+          <option value="saude-espiritual">🧘 Saúde Espiritual</option>
+          <option value="estudos">📚 Estudos</option>
+          <option value="familia">👨‍👩‍👧‍👦 Relacionamentos</option>
+          <option value="trabalho">💼 Trabalho</option>
+        </select>
+        
+        <select id="periodo">
+          <option value="semanal">📅 Semanal</option>
+          <option value="mensal">🗓️ Mensal</option>
+          <option value="trimestral">⏱️ Trimestral</option>
+          <option value="anual">📅 Anual</option>
+        </select>
+      </div>
+      
       <button id="btn-adicionar">+</button>
     </div>
 
-    <!-- Lista de Metas -->
-    <div class="lista-metas">
-      <!-- Dinâmico (gerado via JavaScript) -->
+    <!-- Container das metas organizadas por período -->
+    <div class="metas-container">
+      <!-- Semanais -->
+      <div class="periodo-container" id="semanais-container">
+        <h2>📅 Metas Semanais</h2>
+        <div class="lista-metas" data-periodo="semanal"></div>
+      </div>
+      
+      <!-- Mensais -->
+      <div class="periodo-container" id="mensais-container">
+        <h2>🗓️ Metas Mensais</h2>
+        <div class="lista-metas" data-periodo="mensal"></div>
+      </div>
+      
+      <!-- Trimestrais -->
+      <div class="periodo-container" id="trimestrais-container">
+        <h2>⏱️ Metas Trimestrais</h2>
+        <div class="lista-metas" data-periodo="trimestral"></div>
+      </div>
+      
+      <!-- Anuais -->
+      <div class="periodo-container" id="anuais-container">
+        <h2>📅 Metas Anuais</h2>
+        <div class="lista-metas" data-periodo="anual"></div>
+      </div>
     </div>
+    
     <div class="limpar-container">
-        <button id="limpar-concluidas">🗑️ Limpar Concluídas</button>
+      <button id="limpar-concluidas">🗑️ Limpar Todas Concluídas</button>
     </div>
   </section>
   <section id="prioridades" style="display: none;">
@@ -69,7 +102,7 @@
     <div class="caixa-instrucoes">
       <p>📌 <strong>Como usar:</strong> Defina prioridades, ou seja, atividades que não pode deixar de realizar no dia.
       Clique no ícone ✅ para confirmar a prioridade. Se quiser editar, clique no ícone ✏️.
-      Abaixo, descreva uma atitude difícil que tomou, quer fazer algo ou deixar de fazer algo</p>
+      Abaixo, descreva uma atitude difícil que irá tomar, quer fazer algo ou deixar de fazer algo</p>
     </div>
     <div class="prioridade-container">
         <!-- Prioridade 1 -->
@@ -104,8 +137,31 @@
         
         <!-- Ato Heróico -->
         <div class="ato-heroico">
-            <h3>🏆 Ato Heróico de Hoje</h3>
-            <textarea placeholder="O que você fez de extraordinário hoje?"></textarea>
+          <h3>🏆 Ato Heróico de Hoje</h3>
+          
+          <!-- Campo de texto (editável ou não) -->
+          <textarea id="ato-heroico-texto" placeholder="Qual será seu ato heróico hoje?"></textarea>
+          
+          <!-- Botões de Ação (Editar/Concluir) -->
+          <div class="botoes-ato-heroico">
+            <button id="btn-editar-ato">✏️ Editar</button>
+            <button id="btn-concluir-ato" style="display: none;">✅ Concluir Edição</button>
+          </div>
+          
+          <!-- Botões de Status (Realizado/Não Realizado) -->
+          <div class="status-ato-heroico" style="display: none;">
+            <p>Você cumpriu seu ato heróico?</p>
+            <button id="btn-realizado">👍 Sim</button>
+            <button id="btn-nao-realizado">👎 Não</button>
+          </div>
+          
+          <!-- Diagnóstico (aparece após escolher status) -->
+          <div id="diagnostico-ato-heroico" class="diagnostico-padrao" style="display: none;">
+            <h4>📌 Diagnóstico do Dia</h4>
+            <p id="texto-ato-heroico"></p>
+            <div id="historico-ato-heroico"></div> <!-- Novo container para o histórico -->
+            <button id="btn-alterar-status">🔄 Alterar Status</button>
+          </div>
         </div>
     </div>
   </section>
@@ -175,12 +231,51 @@
       <!-- Os relatórios serão gerados aqui dinamicamente -->
     </div>
   </section>
-
+  <!-- Seção Leitura -->
+  <section id="leitura" style="display: none;">
+    <h1>📚 Leitura</h1>
+    <div class="caixa-instrucoes">
+      <p>📌 <strong>Como usar:</strong> Adicione os livros que está lendo com as datas de início e meta de término. 
+      Quando terminar, preencha a data de conclusão para comparar com sua meta. Clique em ✏️ para editar ou 🗑️ para remover.</p>
+    </div>
+    
+    <!-- Formulário para adicionar novo livro -->
+    <div class="adicionar-livro">
+      <input type="text" id="titulo-livro" placeholder="Título do Livro" class="input-livro">
+      <div class="data-container">
+        <input type="date" id="data-inicio" class="input-livro">
+        <span class="data-legenda">Data de início da leitura</span>
+      </div>
+      <div class="data-container">
+        <input type="date" id="data-meta" class="input-livro">
+        <span class="data-legenda">Meta de término</span>
+      </div>
+      <button id="btn-adicionar-livro">+ Adicionar</button>
+    </div>
+    
+    <!-- Lista de livros -->
+    <div class="lista-livros" id="lista-livros">
+      <!-- Dinâmico (gerado via JavaScript) -->
+    </div>
+    
+    <!-- Modal para marcar como concluído -->
+    <div class="modal-conclusao" id="modal-conclusao" style="display: none;">
+      <div class="modal-conteudo">
+        <h3>Concluir Livro: <span id="modal-titulo-livro"></span></h3>
+        <label for="data-conclusao">Data de Conclusão:</label>
+        <input type="date" id="data-conclusao">
+        <div class="modal-botoes">
+          <button id="btn-confirmar-conclusao">✅ Confirmar</button>
+          <button id="btn-cancelar-conclusao">❌ Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </section>
   <!-- Barra de Navegação (Instagram Style) -->
     <nav class="nav-inferior">
         <a href="#metas" class="nav-item">
             <span>📅</span>
-            <span class="nav-texto">Metas Semanais</span>
+            <span class="nav-texto">Metas Gerais</span>
         </a>
         <a href="#prioridades" class="nav-item">
             <span>🎯</span>
@@ -188,7 +283,11 @@
         </a>
         <a href="#checklist" class="nav-item">
             <span>✅</span>
-            <span class="nav-texto">Checklist Diário</span>
+            <span class="nav-texto">Checklist</span>
+        </a>
+        <a href="#leitura" class="nav-item">
+            <span>📚</span>
+            <span class="nav-texto">Leitura</span>
         </a>
         <a href="#reflexao" class="nav-item">
             <span>💭</span>

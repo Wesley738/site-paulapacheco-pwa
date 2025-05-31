@@ -1,6 +1,5 @@
-// Dados salvos
+// Dados salvos (mantendo suas variáveis existentes)
 let metas = JSON.parse(localStorage.getItem('metas')) || [];
-
 let tarefasChecklist = JSON.parse(localStorage.getItem('checklist')) || [
   { id: 1, texto: "Meditar por 10 minutos", concluida: false },
   { id: 2, texto: "Beber 2L de água", concluida: false }
@@ -88,148 +87,190 @@ document.getElementById('btn-adicionar').addEventListener('click', function() {
   const inputMeta = document.getElementById('nova-meta');
   const textoMeta = inputMeta.value.trim();
   const pilar = document.getElementById('pilar').value;
-
-  // Validação DEBUG (verifique no console)
-  console.log("Meta digitada:", textoMeta);
-  console.log("Pilar selecionado:", pilar);
+  const periodo = document.getElementById('periodo').value;
 
   if (!textoMeta) {
     alert("⚠️ Digite uma meta válida!");
     return;
   }
 
-  // Adiciona a meta
+  // Adiciona a meta com o período
   metas.push({ 
+    id: Date.now(), // Usando timestamp como ID único
     texto: textoMeta, 
-    pilar: pilar, 
+    pilar: pilar,
+    periodo: periodo,
     concluida: false 
   });
 
   // Salva e atualiza
-  localStorage.setItem('metas', JSON.stringify(metas));
+  salvarMetas();
   inputMeta.value = '';
   renderizarMetas();
 });
 
-// Renderiza as metas
+// Função para renderizar metas (atualizada)
 function renderizarMetas() {
-  const listaMetas = document.querySelector('.lista-metas');
-  listaMetas.innerHTML = '';
-
-  // Agrupa por pilar
-  const pilares = {
-    'saude-fisica': { titulo: '💪 Saúde Física', metas: [] },
-    'saude-espiritual': { titulo: '🧘 Saúde Espiritual', metas: [] },
-    'estudos': { titulo: '📚 Estudos', metas: [] },
-    'familia': { titulo: '👨‍👩‍👧‍👦 Família', metas: [] },
-    'trabalho': { titulo: '💼 Trabalho', metas: [] }
-  };
-
-  metas.forEach((meta, index) => {
-    pilares[meta.pilar].metas.push({ ...meta, index });
+  // Limpa todos os containers de metas primeiro
+  document.querySelectorAll('.lista-metas').forEach(container => {
+    container.innerHTML = '';
   });
 
-  // Exibe na tela
-  for (const pilar in pilares) {
-    if (pilares[pilar].metas.length > 0) {
-      const container = document.createElement('div'); // DECLARADO AQUI
-      container.className = 'pilar-container';
+  if (metas.length === 0) {
+    document.querySelectorAll('.lista-metas').forEach(container => {
+      container.innerHTML = '<p class="sem-metas">Nenhuma meta adicionada ainda.</p>';
+    });
+    return;
+  }
 
-      const titulo = document.createElement('div');
-      titulo.className = 'pilar-titulo';
-      titulo.textContent = pilares[pilar].titulo;
-      container.appendChild(titulo);
+  // Organiza metas por período
+  const metasPorPeriodo = {
+    semanal: metas.filter(m => m.periodo === 'semanal'),
+    mensal: metas.filter(m => m.periodo === 'mensal'),
+    trimestral: metas.filter(m => m.periodo === 'trimestral'),
+    anual: metas.filter(m => m.periodo === 'anual')
+  };
 
-      pilares[pilar].metas.forEach(meta => {
-        const item = document.createElement('div');
-        item.className = `meta-item ${meta.concluida ? 'concluida' : ''}`;
+  // Renderiza cada período
+  for (const periodo in metasPorPeriodo) {
+    const containerPeriodo = document.querySelector(`.lista-metas[data-periodo="${periodo}"]`);
+    
+    // Agrupa por pilar dentro de cada período
+    const pilares = {
+      'saude-fisica': { titulo: '💪 Saúde Física', metas: [] },
+      'saude-espiritual': { titulo: '🧘 Saúde Espiritual', metas: [] },
+      'estudos': { titulo: '📚 Estudos', metas: [] },
+      'familia': { titulo: '👨‍👩‍👧‍👦 Relacionamentos', metas: [] },
+      'trabalho': { titulo: '💼 Trabalho', metas: [] }
+    };
 
-        // Checkbox
-        const checkboxContainer = document.createElement('label');
-        checkboxContainer.className = 'checkbox-container';
-        
-        const checkbox = document.createElement('input');
-        checkbox.type = 'checkbox';
-        checkbox.className = 'checkbox-concluida';
-        checkbox.checked = meta.concluida;
-        checkbox.onchange = () => toggleConcluirMeta(meta.index);
-        
-        const checkmark = document.createElement('span');
-        checkmark.className = 'checkmark';
-        
-        checkboxContainer.appendChild(checkbox);
-        checkboxContainer.appendChild(checkmark);
-        item.appendChild(checkboxContainer);
+    metasPorPeriodo[periodo].forEach(meta => {
+      pilares[meta.pilar].metas.push(meta);
+    });
 
-        // Texto da Meta
-        const textoMeta = document.createElement('span');
-        textoMeta.className = 'texto-meta';
-        textoMeta.textContent = meta.texto;
-        item.appendChild(textoMeta);
+    // Renderiza cada pilar dentro do período
+    for (const pilar in pilares) {
+      if (pilares[pilar].metas.length > 0) {
+        const containerPilar = document.createElement('div');
+        containerPilar.className = 'pilar-container';
 
-        // Botões de Ação
-        const acoes = document.createElement('div');
-        acoes.className = 'acoes-meta';
-        
-        const btnEditar = document.createElement('button');
-        btnEditar.className = 'btn-editar';
-        btnEditar.innerHTML = '✏️';
-        btnEditar.onclick = (e) => {
-          e.stopPropagation(); // Evita conflito com o checkbox
-          editarMeta(meta.index);
-        };
-        
-        const btnDeletar = document.createElement('button');
-        btnDeletar.className = 'btn-deletar';
-        btnDeletar.innerHTML = '🗑️';
-        btnDeletar.onclick = (e) => {
-          e.stopPropagation(); // Evita conflito com o checkbox
-          removerMeta(meta.index);
-        };
-        
-        acoes.appendChild(btnEditar);
-        acoes.appendChild(btnDeletar);
-        item.appendChild(acoes);
+        const tituloPilar = document.createElement('div');
+        tituloPilar.className = 'pilar-titulo';
+        tituloPilar.textContent = pilares[pilar].titulo;
+        containerPilar.appendChild(tituloPilar);
 
-        container.appendChild(item);
-      });
+        pilares[pilar].metas.forEach(meta => {
+          const itemMeta = document.createElement('div');
+          itemMeta.className = `meta-item ${meta.concluida ? 'concluida' : ''}`;
+          itemMeta.dataset.id = meta.id;
 
-      listaMetas.appendChild(container);
+          // Checkbox
+          const checkboxContainer = document.createElement('label');
+          checkboxContainer.className = 'checkbox-container';
+          
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.checked = meta.concluida;
+          checkbox.addEventListener('change', () => toggleConcluirMeta(meta.id));
+          
+          const checkmark = document.createElement('span');
+          checkmark.className = 'checkmark';
+          
+          checkboxContainer.appendChild(checkbox);
+          checkboxContainer.appendChild(checkmark);
+          itemMeta.appendChild(checkboxContainer);
+
+          // Texto da Meta
+          const textoMeta = document.createElement('span');
+          textoMeta.className = 'texto-meta';
+          textoMeta.textContent = meta.texto;
+          itemMeta.appendChild(textoMeta);
+
+          // Botões de Ação
+          const acoes = document.createElement('div');
+          acoes.className = 'acoes-meta';
+          
+          const btnEditar = document.createElement('button');
+          btnEditar.className = 'btn-editar';
+          btnEditar.innerHTML = '✏️';
+          btnEditar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            editarMeta(meta.id);
+          });
+          
+          const btnDeletar = document.createElement('button');
+          btnDeletar.className = 'btn-deletar';
+          btnDeletar.innerHTML = '🗑️';
+          btnDeletar.addEventListener('click', (e) => {
+            e.stopPropagation();
+            removerMeta(meta.id);
+          });
+          
+          acoes.appendChild(btnEditar);
+          acoes.appendChild(btnDeletar);
+          itemMeta.appendChild(acoes);
+
+          containerPilar.appendChild(itemMeta);
+        });
+
+        containerPeriodo.appendChild(containerPilar);
+      }
     }
   }
 
+  // Atualiza botão de limpar concluídas
   const totalConcluidas = metas.filter(m => m.concluida).length;
   const btnLimpar = document.getElementById('limpar-concluidas');
   
   if (totalConcluidas > 0) {
     btnLimpar.style.display = 'flex';
-    btnLimpar.innerHTML = `🗑️ Limpar Concluídas (${totalConcluidas})`;
+    btnLimpar.innerHTML = `🗑️ Limpar Todas Concluídas (${totalConcluidas})`;
   } else {
     btnLimpar.style.display = 'none';
   }
 }
 
-function toggleConcluirMeta(index) {
-  metas[index].concluida = !metas[index].concluida;
+
+// 3. Atualize as funções auxiliares para trabalhar com IDs em vez de índices
+function toggleConcluirMeta(id) {
+  const metaIndex = metas.findIndex(m => m.id === id);
+  if (metaIndex !== -1) {
+    metas[metaIndex].concluida = !metas[metaIndex].concluida;
+    salvarMetas();
+    renderizarMetas();
+  }
+}
+
+function editarMeta(id) {
+  const meta = metas.find(m => m.id === id);
+  if (!meta) return;
+
+  const novoTexto = prompt("Editar meta:", meta.texto);
+  if (novoTexto !== null && novoTexto.trim() !== "") {
+    meta.texto = novoTexto.trim();
+    salvarMetas();
+    renderizarMetas();
+  }
+}
+
+function removerMeta(id) {
+  if (confirm('Tem certeza que deseja remover esta meta?')) {
+    metas = metas.filter(m => m.id !== id);
+    salvarMetas();
+    renderizarMetas();
+  }
+}
+
+function limparConcluidas() {
+  if (confirm('Tem certeza que quer apagar todas as metas concluídas?')) {
+    metas = metas.filter(meta => !meta.concluida);
+    salvarMetas();
+    renderizarMetas();
+  }
+}
+
+function salvarMetas() {
   localStorage.setItem('metas', JSON.stringify(metas));
-  renderizarMetas();
-}
-
-function editarMeta(index) {
-  const novaMeta = prompt("Editar meta:", metas[index].texto);
-  if (novaMeta && novaMeta.trim() !== '') {
-    metas[index].texto = novaMeta.trim();
-    localStorage.setItem('metas', JSON.stringify(metas));
-    renderizarMetas();
-  }
-}
-
-function removerMeta(index) {
-  if (confirm("Tem certeza que quer deletar esta meta?")) {
-    metas.splice(index, 1);
-    localStorage.setItem('metas', JSON.stringify(metas));
-    renderizarMetas();
-  }
 }
 
 document.querySelectorAll('.prioridade-item').forEach(item => {
@@ -499,3 +540,457 @@ document.getElementById('btn-nuclear').addEventListener('click', () => {
 
 // Carrega ao iniciar
 window.addEventListener('load', renderizarRelatorios);
+
+// Seção Leitura - Variáveis
+let livros = JSON.parse(localStorage.getItem('livros')) || [];
+
+// Elementos da seção Leitura
+const tituloLivroInput = document.getElementById('titulo-livro');
+const dataInicioInput = document.getElementById('data-inicio');
+const dataMetaInput = document.getElementById('data-meta');
+const btnAdicionarLivro = document.getElementById('btn-adicionar-livro');
+const listaDeLivros = document.getElementById('lista-livros');
+const modalConclusao = document.getElementById('modal-conclusao');
+const modalTituloLivro = document.getElementById('modal-titulo-livro');
+const dataConclusaoInput = document.getElementById('data-conclusao');
+const btnConfirmarConclusao = document.getElementById('btn-confirmar-conclusao');
+const btnCancelarConclusao = document.getElementById('btn-cancelar-conclusao');
+
+// Definir data atual como padrão para data de início
+const hoje = new Date();
+const hojeISO = hoje.toISOString().split('T')[0];
+dataInicioInput.value = hojeISO;
+
+// Event Listeners para Leitura
+btnAdicionarLivro.addEventListener('click', adicionarLivro);
+btnConfirmarConclusao.addEventListener('click', confirmarConclusao);
+btnCancelarConclusao.addEventListener('click', () => {
+  modalConclusao.style.display = 'none';
+});
+
+// Carregar livros ao iniciar
+carregarLivros();
+
+function adicionarLivro() {
+  const titulo = tituloLivroInput.value.trim();
+  const dataInicio = dataInicioInput.value;
+  const dataMeta = dataMetaInput.value;
+
+  if (!titulo || !dataInicio || !dataMeta) {
+    alert('Por favor, preencha todos os campos!');
+    return;
+  }
+
+  const novoLivro = {
+    id: Date.now(),
+    titulo,
+    dataInicio,
+    dataMeta,
+    dataConclusao: null,
+    status: 'em-andamento' // em-andamento, concluído, atrasado
+  };
+
+  livros.push(novoLivro);
+  salvarLivros();
+  renderizarLivros();
+
+  // Limpar campos
+  tituloLivroInput.value = '';
+  dataMetaInput.value = '';
+}
+
+function renderizarLivros() {
+  listaDeLivros.innerHTML = '';
+
+  if (livros.length === 0) {
+    listaDeLivros.innerHTML = '<p class="sem-livros">Nenhum livro adicionado ainda.</p>';
+    return;
+  }
+
+  livros.forEach(livro => {
+    const livroElement = document.createElement('div');
+    livroElement.className = `livro-item ${getStatusLivro(livro)}`;
+    livroElement.dataset.id = livro.id;
+
+    let statusText = '';
+    if (livro.dataConclusao) {
+      const diffDias = calcularDiferencaDias(livro.dataConclusao, livro.dataMeta);
+      statusText = diffDias <= 0 ?  // Mudança na comparação
+        `Concluído ${Math.abs(diffDias)} dias antes do prazo` : 
+        `Concluído ${diffDias} dias após o prazo`;
+    } else {
+      const hoje = new Date().toISOString().split('T')[0];
+      const diffDias = calcularDiferencaDias(livro.dataMeta, hoje);
+      statusText = diffDias >= 0 ? 
+        `${diffDias} dias restantes` : 
+        `${Math.abs(diffDias)} dias de atraso`;
+    }
+
+    livroElement.innerHTML = `
+      <div class="livro-info">
+        <div class="livro-titulo">${livro.titulo}</div>
+        <div class="livro-datas">
+          <div class="livro-data">
+            <span>Início:</span>
+            <span>${formatarData(livro.dataInicio)}</span>
+          </div>
+          <div class="livro-data">
+            <span>Meta:</span>
+            <span>${formatarData(livro.dataMeta)}</span>
+          </div>
+          ${livro.dataConclusao ? `
+            <div class="livro-data">
+              <span>Conclusão:</span>
+              <span>${formatarData(livro.dataConclusao)}</span>
+            </div>
+          ` : ''}
+        </div>
+        <div class="livro-status">${statusText}</div>
+      </div>
+      <div class="livro-acoes">
+        ${!livro.dataConclusao ? `
+          <button class="btn-concluir-livro" data-id="${livro.id}">✅ Concluir</button>
+        ` : ''}
+        <button class="btn-editar-livro" data-id="${livro.id}">✏️</button>
+        <button class="btn-remover-livro" data-id="${livro.id}">🗑️</button>
+      </div>
+    `;
+
+    listaDeLivros.appendChild(livroElement);
+  });
+
+  // Adicionar event listeners aos botões
+  document.querySelectorAll('.btn-concluir-livro').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = parseInt(e.target.dataset.id);
+      abrirModalConclusao(id);
+    });
+  });
+
+  document.querySelectorAll('.btn-editar-livro').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = parseInt(e.target.dataset.id);
+      editarLivro(id);
+    });
+  });
+
+  document.querySelectorAll('.btn-remover-livro').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const id = parseInt(e.target.dataset.id);
+      removerLivro(id);
+    });
+  });
+}
+
+function abrirModalConclusao(id) {
+  const livro = livros.find(l => l.id === id);
+  if (!livro) return;
+
+  modalTituloLivro.textContent = livro.titulo;
+  dataConclusaoInput.valueAsDate = new Date();
+  modalConclusao.style.display = 'flex';
+  modalConclusao.dataset.id = id;
+}
+
+function confirmarConclusao() {
+  const id = parseInt(modalConclusao.dataset.id);
+  const dataConclusao = dataConclusaoInput.value;
+
+  if (!dataConclusao) {
+    alert('Por favor, informe a data de conclusão!');
+    return;
+  }
+
+  const livroIndex = livros.findIndex(l => l.id === id);
+  if (livroIndex === -1) return;
+
+  livros[livroIndex].dataConclusao = dataConclusao;
+  livros[livroIndex].status = 'concluido';
+  salvarLivros();
+  renderizarLivros();
+  modalConclusao.style.display = 'none';
+}
+
+function editarLivro(id) {
+  const livro = livros.find(l => l.id === id);
+  if (!livro) return;
+
+  tituloLivroInput.value = livro.titulo;
+  dataInicioInput.value = livro.dataInicio;
+  dataMetaInput.value = livro.dataMeta;
+
+  // Remover o livro para edição
+  livros = livros.filter(l => l.id !== id);
+  salvarLivros();
+  renderizarLivros();
+}
+
+function removerLivro(id) {
+  if (!confirm('Tem certeza que deseja remover este livro?')) return;
+  
+  livros = livros.filter(l => l.id !== id);
+  salvarLivros();
+  renderizarLivros();
+}
+
+function salvarLivros() {
+  localStorage.setItem('livros', JSON.stringify(livros));
+}
+
+function carregarLivros() {
+  livros = JSON.parse(localStorage.getItem('livros')) || [];
+  renderizarLivros();
+}
+
+// Funções auxiliares
+function formatarData(dataString) {
+  if (!dataString) return '';
+  // Ajuste para compensar o fuso horário
+  const date = new Date(dataString + 'T12:00:00'); // Adiciona meio-dia para evitar problemas de fuso
+  const options = { day: '2-digit', month: '2-digit', year: 'numeric' };
+  return date.toLocaleDateString('pt-BR', options);
+}
+
+function calcularDiferencaDias(dataFinal, dataInicial) {
+  // Ajuste para fuso horário - considera ambas as datas como UTC
+  const date1 = new Date(dataFinal + 'T00:00:00');
+  const date2 = new Date(dataInicial + 'T00:00:00');
+  
+  // Calcula a diferença em milissegundos
+  const diffTime = date1 - date2;
+  
+  // Converte para dias
+  return Math.floor(diffTime / (1000 * 60 * 60 * 24));
+}
+
+function getStatusLivro(livro) {
+  if (livro.dataConclusao) {
+    const diff = calcularDiferencaDias(livro.dataConclusao, livro.dataMeta);
+    return diff <= 0 ? 'livro-no-prazo' : 'livro-atrasado'; // <= em vez de >=
+  } else {
+    const hoje = new Date().toISOString().split('T')[0];
+    const diff = calcularDiferencaDias(livro.dataMeta, hoje);
+    return diff >= 0 ? '' : 'livro-atrasado';
+  }
+}
+
+// ===== NOTIFICAÇÕES PROGRAMADAS ===== //
+document.addEventListener('DOMContentLoaded', function() {
+  // Solicitar permissão para notificações
+  if ('Notification' in window) {
+    Notification.requestPermission().then(permission => {
+      if (permission === 'granted') {
+        console.log('Permissão para notificações concedida!');
+        iniciarVerificacaoNotificacoes();
+      }
+    });
+  }
+
+  // Verifica periodicamente (a cada 1 minuto)
+  function iniciarVerificacaoNotificacoes() {
+    setInterval(verificarHorarioNotificacoes, 60000); // 60.000ms = 1 minuto
+    verificarHorarioNotificacoes(); // Verifica imediatamente ao carregar
+  }
+
+  // Lógica das notificações
+  function verificarHorarioNotificacoes() {
+    const agora = new Date();
+    const hora = agora.getHours();
+    const minutos = agora.getMinutes();
+    const diaSemana = agora.getDay(); // 0 = Domingo, 1 = Segunda, etc.
+
+    // Notificação 1: 21:00 (Checklist noturno)
+    if (hora === 21 && minutos === 0 && !notificacaoHoje('notificacao1')) {
+      enviarNotificacao(
+        '📋 Checklist do Amanhã', 
+        'Já fez o checklist do dia seguinte? Reserve 5 min para planejar e dormir com leveza.'
+      );
+      marcarNotificacaoComoEnviada('notificacao1');
+    }
+
+    // Notificação 2: 13:00 (Revisão de tarefas)
+    if (hora === 13 && minutos === 0 && !notificacaoHoje('notificacao2')) {
+      enviarNotificacao(
+        '✅ Revisão do Dia', 
+        'Já conferiu seu checklist de hoje? Clareza sem ação é só intenção. Revise suas tarefas e siga com propósito.'
+      );
+      marcarNotificacaoComoEnviada('notificacao2');
+    }
+
+    // Notificação 3: 09:00 (Leitura matinal)
+    if (hora === 9 && minutos === 0 && !notificacaoHoje('notificacao3')) {
+      enviarNotificacao(
+        '📚 Hora da Leitura', 
+        'Já leu um pouco hoje? A constância na leitura transforma sua mente e sua rotina.'
+      );
+      marcarNotificacaoComoEnviada('notificacao3');
+    }
+
+    // Notificação 4: Domingo às 17:00 (Planejamento de leitura)
+    if (diaSemana === 0 && hora === 17 && minutos === 0 && !notificacaoHoje('notificacao4')) {
+      enviarNotificacao(
+        '📖 Planejamento Semanal', 
+        'Hora de programar sua leitura da semana! Registre o livro escolhido ou atualize sua meta no +Clareza.'
+      );
+      marcarNotificacaoComoEnviada('notificacao4');
+    }
+  }
+
+  // Função para enviar a notificação
+  function enviarNotificacao(titulo, mensagem) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(titulo, { body: mensagem, icon: 'favicon-32x32.png' });
+    }
+  }
+
+  // Verifica se a notificação já foi enviada hoje
+  function notificacaoHoje(chave) {
+    const hoje = new Date().toLocaleDateString();
+    const notificacoesEnviadas = JSON.parse(localStorage.getItem('notificacoesEnviadas') || '{}');
+    return notificacoesEnviadas[chave] === hoje;
+  }
+
+  // Marca a notificação como enviada hoje
+  function marcarNotificacaoComoEnviada(chave) {
+    const hoje = new Date().toLocaleDateString();
+    const notificacoesEnviadas = JSON.parse(localStorage.getItem('notificacoesEnviadas') || {});
+    notificacoesEnviadas[chave] = hoje;
+    localStorage.setItem('notificacoesEnviadas', JSON.stringify(notificacoesEnviadas));
+  }
+});
+
+// ===== SISTEMA DO ATO HERÓICO - VERSÃO CORRIGIDA ===== //
+document.addEventListener('DOMContentLoaded', function() {
+  // Seletores CORRETOS (usando seus IDs)
+  const elements = {
+    textarea: document.getElementById('ato-heroico-texto'),
+    btnEditar: document.getElementById('btn-editar-ato'),
+    btnConcluir: document.getElementById('btn-concluir-ato'),
+    btnRealizado: document.getElementById('btn-realizado'),
+    btnNaoRealizado: document.getElementById('btn-nao-realizado'),
+    btnAlterarStatus: document.getElementById('btn-alterar-status'),
+    diagnostico: document.getElementById('diagnostico-ato-heroico'),
+    statusContainer: document.querySelector('.status-ato-heroico'),
+    historico: document.getElementById('historico-ato-heroico'),
+    textoExibicao: document.getElementById('texto-ato-heroico')
+  };
+
+  // Estado inicial
+  let state = JSON.parse(localStorage.getItem('atoHeroicoState')) || {
+    texto: '',
+    editando: true,
+    realizado: null,
+    historico: []
+  };
+
+  // Inicialização
+  function init() {
+    elements.textarea.value = state.texto;
+    updateUI();
+    loadHistory();
+  }
+
+  // Atualiza a interface conforme o estado
+  function updateUI() {
+    elements.textarea.readOnly = !state.editando;
+    elements.btnEditar.style.display = state.editando ? 'none' : 'inline-block';
+    elements.btnConcluir.style.display = state.editando ? 'inline-block' : 'none';
+    
+    // CORREÇÃO: Mostrar botões quando em modo de avaliação
+    elements.statusContainer.style.display = 
+        (!state.editando && state.texto && state.realizado === null) ? 'flex' : 'none';
+    
+    elements.diagnostico.style.display = 
+        (state.realizado !== null) ? 'block' : 'none';
+    
+    if (state.realizado !== null) {
+        elements.diagnostico.className = state.realizado 
+            ? 'diagnostico-realizado' 
+            : 'diagnostico-nao-realizado';
+    }
+}
+
+  // Event Listeners CORRETOS
+  elements.btnConcluir.addEventListener('click', () => {
+    if (!elements.textarea.value.trim()) {
+      alert('Por favor, digite seu ato heróico!');
+      return;
+    }
+    
+    state.texto = elements.textarea.value;
+    state.editando = false;
+    saveState();
+    updateUI();
+  });
+
+  elements.btnEditar.addEventListener('click', () => {
+    state.editando = true;
+    saveState();
+    updateUI();
+  });
+
+  elements.btnRealizado.addEventListener('click', () => {
+    registerStatus(true);
+  });
+
+  elements.btnNaoRealizado.addEventListener('click', () => {
+    registerStatus(false);
+  });
+
+  elements.btnAlterarStatus.addEventListener('click', () => {
+    state.realizado = null;
+    saveState();
+    updateUI();
+  });
+
+  // Função para registrar status
+  function registerStatus(realizado) {
+    const now = new Date();
+    const textoAtual = elements.textarea.value;
+    
+    state.realizado = realizado;
+    state.historico.unshift({
+        date: now.toLocaleString('pt-BR'),
+        status: realizado,
+        text: textoAtual
+    });
+    
+    // Limita e salva
+    if (state.historico.length > 10) state.historico.pop();
+    
+    // NOVO: Limpa o campo para novo registro
+    elements.textarea.value = '';
+    state.texto = '';
+    state.editando = true; // Volta para modo de edição
+    
+    saveState();
+    updateUI();
+    loadHistory();
+}
+
+  // Carrega o histórico
+  function loadHistory() {
+    elements.historico.innerHTML = ''; // Limpa completamente antes de recarregar
+    
+    state.historico.forEach((item, index) => {
+        const entry = document.createElement('div');
+        entry.className = `registro-ato ${item.status ? 'realizado' : 'nao-realizado'}`;
+        entry.innerHTML = `
+            <div class="registro-header">
+                <strong>${item.date}</strong>
+                <span>${item.status ? '✅' : '❌'}</span>
+            </div>
+            <div class="registro-texto">${item.text}</div>
+        `;
+        elements.historico.appendChild(entry);
+    });
+}
+
+  // Salva no localStorage
+  function saveState() {
+    localStorage.setItem('atoHeroicoState', JSON.stringify(state));
+  }
+
+  // Inicia
+  init();
+});
