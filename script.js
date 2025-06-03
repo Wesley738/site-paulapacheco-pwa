@@ -912,17 +912,80 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // SISTEMA DE NOTIFICAÇÕES
 
+// Solicitar permissão
+async function requestNotificationPermission() {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+        console.log('Permissão concedida!');
+        scheduleLocalNotifications();
+    }
+}
+
+// Agendar notificações diárias
+function scheduleLocalNotifications() {
+    if (!('serviceWorker' in navigator)) return;
+
+    navigator.serviceWorker.ready.then((registration) => {
+        // Notificação das 09:00
+        scheduleNotification(registration, '09:00', 'Já leu um pouco hoje?', 'A constância na leitura transforma sua mente e sua rotina.');
+
+        // Notificação das 13:00
+        scheduleNotification(registration, '13:00', 'Já conferiu seu checklist de hoje?', 'Clareza sem ação é só intenção. Revise suas tarefas e siga com propósito.');
+
+        // Notificação das 21:00
+        scheduleNotification(registration, '21:00', 'Já fez o checklist do dia seguinte?', 'Reserve 5 min para planejar e dormir com leveza.');
+
+        // Notificação de Domingo às 17:00
+        scheduleWeeklyNotification(registration, 0, '17:00', 'Hora de programar sua leitura da semana!', 'Registre o livro escolhido ou atualize sua meta no +Clareza');
+    });
+}
+
+function scheduleNotification(registration, time, title, body) {
+    const [hour, minute] = time.split(':').map(Number);
+    const now = new Date();
+    const triggerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0);
+
+    // Se já passou do horário hoje, agende para amanhã
+    if (triggerTime <= now) triggerTime.setDate(triggerTime.getDate() + 1);
+
+    const delay = triggerTime.getTime() - now.getTime();
+
+    setTimeout(() => {
+        registration.showNotification(title, { body });
+        scheduleNotification(registration, time, title, body); // Reagendar
+    }, delay);
+}
+
+function scheduleWeeklyNotification(registration, dayOfWeek, time, title, body) {
+    const [hour, minute] = time.split(':').map(Number);
+    const now = new Date();
+    const triggerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0);
+
+    // Ajustar para o próximo dia da semana
+    while (triggerTime.getDay() !== dayOfWeek || triggerTime <= now) {
+        triggerTime.setDate(triggerTime.getDate() + 1);
+    }
+
+    const delay = triggerTime.getTime() - now.getTime();
+
+    setTimeout(() => {
+        registration.showNotification(title, { body });
+        scheduleWeeklyNotification(registration, dayOfWeek, time, title, body); // Reagendar
+    }, delay);
+}
+
 // firebase-messaging-sw.js
 importScripts('https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js');
 
-firebase.initializeApp({
-  apiKey: "SUA_API_KEY",
-  authDomain: "SEU_PROJETO.firebaseapp.com",
-  projectId: "SEU_PROJETO_ID",
-  storageBucket: "SEU_PROJETO.appspot.com",
-  messagingSenderId: "NUMERO_DO_SENDER",
-  appId: "APP_ID"
+firebase.initializeApp( {
+  apiKey: "AIzaSyArFPaaF04sxtCvqAMtvLCjdgO2i8l33K8",
+  authDomain: "projeto-mais-clareza.firebaseapp.com",
+  projectId: "projeto-mais-clareza",
+  storageBucket: "projeto-mais-clareza.firebasestorage.app",
+  messagingSenderId: "785772047805",
+  appId: "1:785772047805:web:25148daad54b194111b6d4",
+  measurementId: "G-YBBPGHSX9Z"
 });
 
 const messaging = firebase.messaging();
