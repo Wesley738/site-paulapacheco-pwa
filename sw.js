@@ -27,3 +27,36 @@ self.addEventListener('fetch', event => {
       .then(response => response || fetch(event.request))
   );
 });
+
+// ==== SISTEMA DE NOTIFICAÇÕES ====
+self.addEventListener('install', (event) => {
+    self.skipWaiting();
+    console.log('Service Worker instalado');
+});
+
+self.addEventListener('activate', (event) => {
+    console.log('Service Worker ativado');
+});
+
+// Mostrar notificação quando receber um 'push'
+self.addEventListener('push', (event) => {
+    const data = event.data?.json() || { title: 'Notificação', body: 'Mensagem padrão' };
+    
+    event.waitUntil(
+        self.registration.showNotification(data.title, {
+            body: data.body,
+            icon: 'icon-192x192.png',
+            badge: 'badge.png',
+            vibrate: [200, 100, 200],
+            data: { url: '/' }
+        })
+    );  
+});
+
+// Lidar com clique na notificação
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    event.waitUntil(
+        clients.openWindow(event.notification.data.url || '/')
+    );
+});

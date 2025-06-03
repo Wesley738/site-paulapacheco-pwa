@@ -22,7 +22,26 @@
         });
     });
   }
-</script>
+  </script>
+  <!-- SISTEMA DE NOTICAÇÕES -->
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyArFPaaF04sxtCvqAMtvLCjdgO2i8l33K8",
+      authDomain: "projeto-mais-clareza.firebaseapp.com",
+      projectId: "projeto-mais-clareza",
+      storageBucket: "projeto-mais-clareza.firebasestorage.app",
+      messagingSenderId: "785772047805",
+      appId: "1:785772047805:web:25148daad54b194111b6d4",
+      measurementId: "G-YBBPGHSX9Z"
+    };
+
+    // Inicializa o Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
 
 </head>
 <body>

@@ -774,91 +774,6 @@ function getStatusLivro(livro) {
   }
 }
 
-// ===== NOTIFICAÇÕES PROGRAMADAS ===== //
-document.addEventListener('DOMContentLoaded', function() {
-  // Solicitar permissão para notificações
-  if ('Notification' in window) {
-    Notification.requestPermission().then(permission => {
-      if (permission === 'granted') {
-        console.log('Permissão para notificações concedida!');
-        iniciarVerificacaoNotificacoes();
-      }
-    });
-  }
-
-  // Verifica periodicamente (a cada 1 minuto)
-  function iniciarVerificacaoNotificacoes() {
-    setInterval(verificarHorarioNotificacoes, 60000); // 60.000ms = 1 minuto
-    verificarHorarioNotificacoes(); // Verifica imediatamente ao carregar
-  }
-
-  // Lógica das notificações
-  function verificarHorarioNotificacoes() {
-    const agora = new Date();
-    const hora = agora.getHours();
-    const minutos = agora.getMinutes();
-    const diaSemana = agora.getDay(); // 0 = Domingo, 1 = Segunda, etc.
-
-    // Notificação 1: 21:00 (Checklist noturno)
-    if (hora === 21 && minutos === 0 && !notificacaoHoje('notificacao1')) {
-      enviarNotificacao(
-        '📋 Checklist do Amanhã', 
-        'Já fez o checklist do dia seguinte? Reserve 5 min para planejar e dormir com leveza.'
-      );
-      marcarNotificacaoComoEnviada('notificacao1');
-    }
-
-    // Notificação 2: 13:00 (Revisão de tarefas)
-    if (hora === 13 && minutos === 0 && !notificacaoHoje('notificacao2')) {
-      enviarNotificacao(
-        '✅ Revisão do Dia', 
-        'Já conferiu seu checklist de hoje? Clareza sem ação é só intenção. Revise suas tarefas e siga com propósito.'
-      );
-      marcarNotificacaoComoEnviada('notificacao2');
-    }
-
-    // Notificação 3: 09:00 (Leitura matinal)
-    if (hora === 9 && minutos === 0 && !notificacaoHoje('notificacao3')) {
-      enviarNotificacao(
-        '📚 Hora da Leitura', 
-        'Já leu um pouco hoje? A constância na leitura transforma sua mente e sua rotina.'
-      );
-      marcarNotificacaoComoEnviada('notificacao3');
-    }
-
-    // Notificação 4: Domingo às 17:00 (Planejamento de leitura)
-    if (diaSemana === 0 && hora === 17 && minutos === 0 && !notificacaoHoje('notificacao4')) {
-      enviarNotificacao(
-        '📖 Planejamento Semanal', 
-        'Hora de programar sua leitura da semana! Registre o livro escolhido ou atualize sua meta no +Clareza.'
-      );
-      marcarNotificacaoComoEnviada('notificacao4');
-    }
-  }
-
-  // Função para enviar a notificação
-  function enviarNotificacao(titulo, mensagem) {
-    if ('Notification' in window && Notification.permission === 'granted') {
-      new Notification(titulo, { body: mensagem, icon: 'favicon-32x32.png' });
-    }
-  }
-
-  // Verifica se a notificação já foi enviada hoje
-  function notificacaoHoje(chave) {
-    const hoje = new Date().toLocaleDateString();
-    const notificacoesEnviadas = JSON.parse(localStorage.getItem('notificacoesEnviadas') || '{}');
-    return notificacoesEnviadas[chave] === hoje;
-  }
-
-  // Marca a notificação como enviada hoje
-  function marcarNotificacaoComoEnviada(chave) {
-    const hoje = new Date().toLocaleDateString();
-    const notificacoesEnviadas = JSON.parse(localStorage.getItem('notificacoesEnviadas') || {});
-    notificacoesEnviadas[chave] = hoje;
-    localStorage.setItem('notificacoesEnviadas', JSON.stringify(notificacoesEnviadas));
-  }
-});
-
 // ===== SISTEMA DO ATO HERÓICO - VERSÃO CORRIGIDA ===== //
 document.addEventListener('DOMContentLoaded', function() {
   // Seletores CORRETOS (usando seus IDs)
@@ -994,3 +909,55 @@ document.addEventListener('DOMContentLoaded', function() {
   // Inicia
   init();
 });
+
+// SISTEMA DE NOTIFICAÇÕES
+
+// firebase-messaging-sw.js
+importScripts('https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js');
+
+firebase.initializeApp({
+  apiKey: "SUA_API_KEY",
+  authDomain: "SEU_PROJETO.firebaseapp.com",
+  projectId: "SEU_PROJETO_ID",
+  storageBucket: "SEU_PROJETO.appspot.com",
+  messagingSenderId: "NUMERO_DO_SENDER",
+  appId: "APP_ID"
+});
+
+const messaging = firebase.messaging();
+
+// Ouvir mensagens em segundo plano (quando o app está fechado)
+messaging.onBackgroundMessage((payload) => {
+  console.log('Notificação recebida em background:', payload);
+  
+  const { title, body } = payload.notification;
+  
+  self.registration.showNotification(title, {
+    body,
+    icon: '/icon-192x192.png',
+    badge: '/badge.png',
+    vibrate: [200, 100, 200]
+  });
+});
+
+async function requestPushPermission() {
+  try {
+    const permission = await Notification.requestPermission();
+    if (permission === 'granted') {
+      console.log('Permissão concedida!');
+      
+      // Obtém o token FCM (usado para enviar notificações)
+      const token = await messaging.getToken();
+      console.log('Token FCM:', token);
+      
+      // Envie esse token para seu backend (se necessário)
+      // Exemplo: fetch('/salvar-token', { method: 'POST', body: token });
+    }
+  } catch (error) {
+    console.error('Erro ao solicitar permissão:', error);
+  }
+}
+
+// Chame essa função quando o usuário clicar em um botão
+document.getElementById('btn-notificacoes').addEventListener('click', requestPushPermission);
