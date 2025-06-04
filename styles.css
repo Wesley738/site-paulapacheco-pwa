@@ -84,7 +84,7 @@ h1::before {
   top: 0;
   left: 0;
   right: 0;
-  height: 60px; /* Altura da barra */
+  height: 70px; /* Altura da barra */
   background-color: #ffffff; /* Cor de fundo */
   display: flex;
   align-items: center;
@@ -102,7 +102,7 @@ h1::before {
 }
 
 .logo {
-  height: 55px; /* Ajuste conforme necessário */
+  height: 60px; /* Ajuste conforme necessário */
   width: auto;
 }
 
@@ -1174,134 +1174,135 @@ body {
   margin-bottom: 15px;
 }
 
-/* === Botões (Editar/Concluir/Status) === */
-.botoes-ato-heroico, 
-.status-ato-heroico {
+.input-ato-heroico {
+  width: 100%;
+  min-height: 80px;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 10px;
+  font-family: inherit;
+  resize: vertical;
+}
+
+.ato-heroico-botoes {
   display: flex;
   gap: 10px;
   margin-bottom: 15px;
 }
 
-.botoes-ato-heroico button,
-.status-ato-heroico button {
-  padding: 8px 12px;
+.btn-concluir-ato, .btn-editar-ato {
+  padding: 8px 15px;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
+  background-color: #f0f0f0;
   cursor: pointer;
-  font-weight: 500;
-  transition: 0.2s;
+  transition: background-color 0.3s;
 }
 
-/* === Botões do Ato Heróico (seguindo seu estilo) === */
-#btn-editar-ato, 
-#btn-concluir-ato,
-#btn-realizado,
-#btn-nao-realizado,
-#btn-alterar-status {
+.btn-concluir-ato:hover, .btn-editar-ato:hover {
+  background-color: #e0e0e0;
+}
+
+.confirmacao-ato {
+  margin: 15px 0;
+  padding: 15px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+}
+
+.confirmacao-ato p {
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.botoes-confirmacao {
+  display: flex;
+  gap: 10px;
+}
+
+.btn-sim, .btn-nao {
+  padding: 8px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.btn-sim {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.btn-sim:hover {
+  background-color: #c3e6cb;
+}
+
+.btn-nao {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.btn-nao:hover {
+  background-color: #f5c6cb;
+}
+
+.relatorios-container {
+  margin-top: 20px;
+}
+
+.relatorio-item {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  border-left: 4px solid #df9b1d;
+}
+
+.relatorio-data {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.relatorio-ato {
+  margin: 10px 0;
+  font-weight: bold;
+}
+
+.relatorio-resultado {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  margin-top: 5px;
+}
+
+.relatorio-resultado.sim {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.relatorio-resultado.nao {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.relatorio-acoes {
+  margin-top: 10px;
+  text-align: right;
+}
+
+.btn-excluir-relatorio {
   background: none;
   border: none;
   cursor: pointer;
-  font-size: 0.9rem;
-  padding: 5px 10px;
-  border-radius: 5px;
-  transition: all 0.2s;
+  font-size: 1rem;
+  color: #999;
 }
 
-#btn-editar-ato {
-  background: #3498db !important;
-  color: white !important;
-}
-
-#btn-concluir-ato {
-  background: #2ecc71 !important;
-  color: white !important;
-}
-
-#btn-realizado {
-  background: #2ecc71 !important;
-  color: white !important;
-}
-
-#btn-nao-realizado {
-  background: #e74c3c !important;
-  color: white !important;
-}
-
-#btn-alterar-status {
-  background: #f39c12 !important;
-  color: white !important;
-}
-
-/* Efeitos hover */
-#btn-editar-ato:hover { opacity: 0.9; }
-#btn-concluir-ato:hover { opacity: 0.9; }
-#btn-realizado:hover { opacity: 0.9; }
-#btn-nao-realizado:hover { opacity: 0.9; }
-#btn-alterar-status:hover { opacity: 0.9; }
-
-/* === Diagnóstico (estilo igual ao seu, mas com cores de status) === */
-#diagnostico-ato-heroico {
-  padding: 20px;
-  border-radius: 12px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  margin-top: 15px;
-}
-
-/* Cores baseadas no status */
-.diagnostico-padrao {
-  background: #fff8e1; /* Amarelo claro (padrão) */
-  border-left: 4px solid #f39c12; /* Amarelo */
-}
-
-.diagnostico-realizado {
-  background: #e8f5e9; /* Verde claro */
-  border-left: 4px solid #2ecc71; /* Verde */
-}
-
-.diagnostico-nao-realizado {
-  background: #ffebee; /* Vermelho claro */
-  border-left: 4px solid #e74c3c; /* Vermelho */
-}
-
-#diagnostico-ato-heroico h4 {
-  color: #a36c06;
-  font-size: 1.1rem;
-  margin-top: 0;
-}
-
-#diagnostico-ato-heroico p {
-  margin: 10px 0;
-  color: #333;
-}
-
-/* Estilo para os registros de histórico */
-/* Estilo para cada registro */
-.registro-ato {
-    margin-bottom: 15px;
-    padding: 15px;
-    border-radius: 8px;
-    background: white;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-}
-
-.registro-header {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-    padding-bottom: 5px;
-    border-bottom: 1px solid #eee;
-}
-
-.registro-texto {
-    color: #555;
-    line-height: 1.4;
-}
-
-/* Cores de status */
-.registro-ato.realizado {
-    border-left: 4px solid #2ecc71;
-}
-
-.registro-ato.nao-realizado {
-    border-left: 4px solid #e74c3c;
+.btn-excluir-relatorio:hover {
+  color: #ff6b6b;
 }

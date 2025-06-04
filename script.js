@@ -773,3 +773,154 @@ function getStatusLivro(livro) {
     return diff >= 0 ? '' : 'livro-atrasado';
   }
 }
+
+// Variáveis globais
+let atoHeroicoEditavel = true;
+const RELATORIOS_KEY = 'relatoriosAtoHeroico';
+
+// Função para carregar relatórios do localStorage
+function carregarRelatorios() {
+  const relatoriosContainer = document.getElementById('relatorios-ato-heroico');
+  const relatoriosSalvos = JSON.parse(localStorage.getItem(RELATORIOS_KEY)) || [];
+  
+  // Limpar relatórios antigos (mais de 30 dias)
+  const trintaDiasAtras = new Date();
+  trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
+  
+  const relatoriosAtualizados = relatoriosSalvos.filter(relatorio => {
+    const dataRelatorio = new Date(relatorio.data);
+    return dataRelatorio >= trintaDiasAtras;
+  });
+  
+  // Salvar relatórios filtrados
+  if (relatoriosSalvos.length !== relatoriosAtualizados.length) {
+    localStorage.setItem(RELATORIOS_KEY, JSON.stringify(relatoriosAtualizados));
+  }
+  
+  // Exibir relatórios
+  relatoriosContainer.innerHTML = '';
+  relatoriosAtualizados.forEach(relatorio => {
+    const relatorioItem = criarElementoRelatorio(relatorio);
+    relatoriosContainer.appendChild(relatorioItem);
+  });
+}
+
+// Função para criar elemento de relatório
+function criarElementoRelatorio(relatorio) {
+  const relatorioDiv = document.createElement('div');
+  relatorioDiv.className = 'relatorio-item';
+  
+  const dataParaExibir = new Date(relatorio.data).toLocaleDateString('pt-BR');
+  
+  relatorioDiv.innerHTML = `
+    <div class="relatorio-data">${dataParaExibir}</div>
+    <div class="relatorio-ato">${relatorio.ato}</div>
+    <div class="relatorio-resultado ${relatorio.resultado}">
+      Você ${relatorio.resultado === 'sim' ? 'conseguiu' : 'não conseguiu'} realizar
+    </div>
+    <div class="relatorio-acoes">
+      <button class="btn-excluir-relatorio" data-id="${relatorio.id}">🗑️</button>
+    </div>
+  `;
+  
+  return relatorioDiv;
+}
+
+// Função para salvar relatório
+function salvarRelatorio(resultado) {
+  const atoHeroicoTexto = document.getElementById('ato-heroico-texto').value;
+  if (!atoHeroicoTexto.trim()) return;
+  
+  const relatoriosSalvos = JSON.parse(localStorage.getItem(RELATORIOS_KEY)) || [];
+  
+  const novoRelatorio = {
+    id: Date.now().toString(),
+    data: new Date().toISOString(),
+    ato: atoHeroicoTexto,
+    resultado: resultado
+  };
+  
+  relatoriosSalvos.unshift(novoRelatorio); // Adiciona no início do array
+  localStorage.setItem(RELATORIOS_KEY, JSON.stringify(relatoriosSalvos));
+  
+  // Recarregar relatórios
+  carregarRelatorios();
+}
+
+// Event Listeners
+document.addEventListener('DOMContentLoaded', function() {
+  // Carregar relatórios ao iniciar
+  carregarRelatorios();
+  
+  // Elementos
+  const btnConcluirAto = document.getElementById('btn-concluir-ato');
+  const btnEditarAto = document.getElementById('btn-editar-ato');
+  const atoHeroicoTexto = document.getElementById('ato-heroico-texto');
+  const confirmacaoAto = document.getElementById('confirmacao-ato');
+  const btnSim = document.getElementById('btn-sim');
+  const btnNao = document.getElementById('btn-nao');
+  const relatoriosContainer = document.getElementById('relatorios-ato-heroico');
+  
+  // Concluir edição do ato heroico
+  btnConcluirAto.addEventListener('click', function() {
+    if (!atoHeroicoTexto.value.trim()) {
+      alert('Por favor, digite seu ato heroico antes de concluir.');
+      return;
+    }
+    
+    atoHeroicoEditavel = false;
+    atoHeroicoTexto.readOnly = true;
+    btnConcluirAto.style.display = 'none';
+    btnEditarAto.style.display = 'block';
+    confirmacaoAto.style.display = 'block';
+  });
+  
+  // Editar ato heroico
+  btnEditarAto.addEventListener('click', function() {
+    atoHeroicoEditavel = true;
+    atoHeroicoTexto.readOnly = false;
+    btnConcluirAto.style.display = 'block';
+    btnEditarAto.style.display = 'none';
+    confirmacaoAto.style.display = 'none';
+  });
+  
+  // Botão Sim (conseguiu realizar)
+  btnSim.addEventListener('click', function() {
+    salvarRelatorio('sim');
+    confirmacaoAto.style.display = 'none';
+  });
+  
+  // Botão Não (não conseguiu realizar)
+  btnNao.addEventListener('click', function() {
+    salvarRelatorio('nao');
+    confirmacaoAto.style.display = 'none';
+  });
+  
+  // Delegar evento para botões de excluir (que são dinâmicos)
+  relatoriosContainer.addEventListener('click', function(e) {
+    if (e.target.classList.contains('btn-excluir-relatorio')) {
+      const idRelatorio = e.target.getAttribute('data-id');
+      const relatoriosSalvos = JSON.parse(localStorage.getItem(RELATORIOS_KEY)) || [];
+      
+      const relatoriosAtualizados = relatoriosSalvos.filter(
+        relatorio => relatorio.id !== idRelatorio
+      );
+      
+      localStorage.setItem(RELATORIOS_KEY, JSON.stringify(relatoriosAtualizados));
+      carregarRelatorios();
+      
+      // Se for o relatório mais recente, permite editar novamente
+      if (relatoriosAtualizados.length === 0 || 
+          relatoriosAtualizados[0].id !== idRelatorio) {
+        return;
+      }
+      
+      // Se estiver excluindo o relatório mais recente, permite editar o ato novamente
+      atoHeroicoEditavel = true;
+      atoHeroicoTexto.readOnly = false;
+      btnConcluirAto.style.display = 'block';
+      btnEditarAto.style.display = 'none';
+      confirmacaoAto.style.display = 'none';
+    }
+  });
+});

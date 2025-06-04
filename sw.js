@@ -13,8 +13,6 @@ const ASSETS_TO_CACHE = [
   "/favicon.ico",
   "/icon-192x192.png",
   "/icon-512x512.png",
-  "/badge.png",
-  "/firebase-messaging-sw.js"
 ];
 
 // Instala o Service Worker e cacheia os recursos

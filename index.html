@@ -135,29 +135,24 @@
         <!-- Ato Heróico -->
         <div class="ato-heroico">
           <h3>🏆 Ato Heróico de Hoje</h3>
-          
-          <!-- Campo de texto (editável ou não) -->
-          <textarea id="ato-heroico-texto" placeholder="Qual será seu ato heróico hoje?"></textarea>
-          
-          <!-- Botões de Ação (Editar/Concluir) -->
-          <div class="botoes-ato-heroico">
-            <button id="btn-editar-ato">✏️ Editar</button>
-            <button id="btn-concluir-ato" style="display: none;">✅ Concluir Edição</button>
+          <div class="ato-heroico-container">
+            <textarea id="ato-heroico-texto" placeholder="Qual será seu ato heróico hoje?" class="input-ato-heroico"></textarea>
+            <div class="ato-heroico-botoes">
+              <button class="btn-concluir-ato" id="btn-concluir-ato">✅ Concluir Edição</button>
+              <button class="btn-editar-ato" id="btn-editar-ato" style="display: none;">✏️ Editar</button>
+            </div>
           </div>
           
-          <!-- Botões de Status (Realizado/Não Realizado) -->
-          <div class="status-ato-heroico" style="display: none;">
-            <p>Você cumpriu seu ato heróico?</p>
-            <button id="btn-realizado">👍 Sim</button>
-            <button id="btn-nao-realizado">👎 Não</button>
+          <div class="confirmacao-ato" id="confirmacao-ato" style="display: none;">
+            <p>Você conseguiu realizar esse ato heroico?</p>
+            <div class="botoes-confirmacao">
+              <button class="btn-sim" id="btn-sim">👍 Sim</button>
+              <button class="btn-nao" id="btn-nao">👎 Não</button>
+            </div>
           </div>
           
-          <!-- Diagnóstico (aparece após escolher status) -->
-          <div id="diagnostico-ato-heroico" class="diagnostico-padrao" style="display: none;">
-            <h4>📌 Diagnóstico do Dia</h4>
-            <p id="texto-ato-heroico"></p>
-            <div id="historico-ato-heroico"></div> <!-- Novo container para o histórico -->
-            <button id="btn-alterar-status">🔄 Alterar Status</button>
+          <div id="relatorios-ato-heroico" class="relatorios-container">
+            <!-- Relatórios serão inseridos aqui dinamicamente -->
           </div>
         </div>
     </div>
