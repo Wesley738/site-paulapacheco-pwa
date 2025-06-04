@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monitoramento de Rotina</title>
-  
+  <title>+ Clareza</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon">
   <link rel="icon" href="favicon-32x32.png" type="image/png" sizes="32x32">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -24,33 +23,20 @@
   }
   </script>
   <!-- SISTEMA DE NOTICAÇÕES -->
-  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyArFPaaF04sxtCvqAMtvLCjdgO2i8l33K8",
-      authDomain: "projeto-mais-clareza.firebaseapp.com",
-      projectId: "projeto-mais-clareza",
-      storageBucket: "projeto-mais-clareza.firebasestorage.app",
-      messagingSenderId: "785772047805",
-      appId: "1:785772047805:web:25148daad54b194111b6d4",
-      measurementId: "G-YBBPGHSX9Z"
-    };
-
-    // Inicializa o Firebase
-    const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
-  </script>
-
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.0.0/firebase-messaging-compat.js"></script>
 </head>
 <body>
   <!-- Barra Superior Fixa -->
   <header class="barra-superior">
+    <!-- Botão de Notificação (versão simplificada) -->
+    <button id="notificacao-btn" class="botao-notificacao" aria-label="Ativar Notificações">
+      🔔 <!-- Emoji como fallback universal -->
+    </button>
+    
+    <!-- Logo centralizado -->
     <div class="logo-container">
-      <img src="logo.png" alt="Logo da Empresa" class="logo">
-      <!-- Ou use texto se preferir -->
-      <!-- <h1 class="logo-texto">Nome da Empresa</h1> -->
+      <img src="logo.png" alt="Logo +Clareza" class="logo">
     </div>
   </header>
   <section id="metas">

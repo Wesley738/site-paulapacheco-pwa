@@ -911,116 +911,109 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // SISTEMA DE NOTIFICAÇÕES
-
-// Solicitar permissão
-async function requestNotificationPermission() {
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-        console.log('Permissão concedida!');
-        scheduleLocalNotifications();
-    }
-}
-
-// Agendar notificações diárias
-function scheduleLocalNotifications() {
-    if (!('serviceWorker' in navigator)) return;
-
-    navigator.serviceWorker.ready.then((registration) => {
-        // Notificação das 09:00
-        scheduleNotification(registration, '09:00', 'Já leu um pouco hoje?', 'A constância na leitura transforma sua mente e sua rotina.');
-
-        // Notificação das 13:00
-        scheduleNotification(registration, '13:00', 'Já conferiu seu checklist de hoje?', 'Clareza sem ação é só intenção. Revise suas tarefas e siga com propósito.');
-
-        // Notificação das 21:00
-        scheduleNotification(registration, '21:00', 'Já fez o checklist do dia seguinte?', 'Reserve 5 min para planejar e dormir com leveza.');
-
-        // Notificação de Domingo às 17:00
-        scheduleWeeklyNotification(registration, 0, '17:00', 'Hora de programar sua leitura da semana!', 'Registre o livro escolhido ou atualize sua meta no +Clareza');
-    });
-}
-
-function scheduleNotification(registration, time, title, body) {
-    const [hour, minute] = time.split(':').map(Number);
-    const now = new Date();
-    const triggerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0);
-
-    // Se já passou do horário hoje, agende para amanhã
-    if (triggerTime <= now) triggerTime.setDate(triggerTime.getDate() + 1);
-
-    const delay = triggerTime.getTime() - now.getTime();
-
-    setTimeout(() => {
-        registration.showNotification(title, { body });
-        scheduleNotification(registration, time, title, body); // Reagendar
-    }, delay);
-}
-
-function scheduleWeeklyNotification(registration, dayOfWeek, time, title, body) {
-    const [hour, minute] = time.split(':').map(Number);
-    const now = new Date();
-    const triggerTime = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hour, minute, 0);
-
-    // Ajustar para o próximo dia da semana
-    while (triggerTime.getDay() !== dayOfWeek || triggerTime <= now) {
-        triggerTime.setDate(triggerTime.getDate() + 1);
-    }
-
-    const delay = triggerTime.getTime() - now.getTime();
-
-    setTimeout(() => {
-        registration.showNotification(title, { body });
-        scheduleWeeklyNotification(registration, dayOfWeek, time, title, body); // Reagendar
-    }, delay);
-}
-
-// firebase-messaging-sw.js
-importScripts('https://www.gstatic.com/firebasejs/11.8.1/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/11.8.1/firebase-analytics.js');
-
-firebase.initializeApp( {
+const notificacaoBtn = document.getElementById('notificacao-btn');
+const firebaseConfig = {
   apiKey: "AIzaSyArFPaaF04sxtCvqAMtvLCjdgO2i8l33K8",
   authDomain: "projeto-mais-clareza.firebaseapp.com",
   projectId: "projeto-mais-clareza",
-  storageBucket: "projeto-mais-clareza.firebasestorage.app",
+  storageBucket: "projeto-mais-clareza.appspot.com",
   messagingSenderId: "785772047805",
-  appId: "1:785772047805:web:25148daad54b194111b6d4",
-  measurementId: "G-YBBPGHSX9Z"
-});
+  appId: "1:785772047805:web:25148daad54b194111b6d4"
+};
 
-const messaging = firebase.messaging();
+let messaging = null;
 
-// Ouvir mensagens em segundo plano (quando o app está fechado)
-messaging.onBackgroundMessage((payload) => {
-  console.log('Notificação recebida em background:', payload);
-  
-  const { title, body } = payload.notification;
-  
-  self.registration.showNotification(title, {
-    body,
-    icon: '/icon-192x192.png',
-    badge: '/badge.png',
-    vibrate: [200, 100, 200]
-  });
-});
-
-async function requestPushPermission() {
+// Função para registrar o Service Worker
+async function registerServiceWorker() {
   try {
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-      console.log('Permissão concedida!');
-      
-      // Obtém o token FCM (usado para enviar notificações)
-      const token = await messaging.getToken();
-      console.log('Token FCM:', token);
-      
-      // Envie esse token para seu backend (se necessário)
-      // Exemplo: fetch('/salvar-token', { method: 'POST', body: token });
-    }
+    const registration = await navigator.serviceWorker.register('/firebase-messaging-sw.js', {
+      scope: '/'
+    });
+    console.log('Service Worker registrado com sucesso:', registration);
+    return registration;
   } catch (error) {
-    console.error('Erro ao solicitar permissão:', error);
+    console.error('Falha ao registrar Service Worker:', error);
+    throw error;
   }
 }
 
-// Chame essa função quando o usuário clicar em um botão
-document.getElementById('btn-notificacoes').addEventListener('click', requestPushPermission);
+// Função para inicializar o Firebase Messaging
+async function initializeFirebaseMessaging() {
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+  messaging = firebase.messaging();
+  
+  // Configuração adicional para desenvolvimento local
+  if (window.location.hostname === "localhost") {
+    messaging.usePublicVapidKey("SUA_CHAVE_VAPID_AQUI");
+  }
+}
+
+// Função principal para ativar notificações
+async function ativarNotificacoes() {
+  try {
+    // 1. Registrar Service Worker
+    await registerServiceWorker();
+    
+    // 2. Inicializar Firebase Messaging
+    await initializeFirebaseMessaging();
+    
+    // 3. Solicitar permissão
+    const permission = await Notification.requestPermission();
+    
+    if (permission === 'granted') {
+      console.log('Permissão concedida!');
+      notificacaoBtn.textContent = '🔔✅';
+      
+      // 4. Obter token FCM
+      const token = await messaging.getToken();
+      console.log('Token FCM:', token);
+      
+      // 5. Agendar notificações (se aplicável)
+      if (typeof agendarNotificacoes === 'function') {
+        agendarNotificacoes();
+      }
+      
+      setTimeout(() => {
+        notificacaoBtn.textContent = '🔔';
+      }, 2000);
+    } else {
+      notificacaoBtn.textContent = '🔔❌';
+      setTimeout(() => {
+        notificacaoBtn.textContent = '🔔';
+      }, 2000);
+    }
+  } catch (error) {
+    console.error('Erro detalhado:', error);
+    notificacaoBtn.textContent = '⚠️ Erro';
+    
+    // Mostra detalhes do erro específico
+    if (error.code === 'messaging/failed-serviceworker-registration') {
+      console.error('Problema no registro do Service Worker');
+    } else if (error.code === 'messaging/permission-blocked') {
+      console.error('Permissões bloqueadas pelo usuário');
+    }
+    
+    setTimeout(() => {
+      notificacaoBtn.textContent = '🔔';
+    }, 2000);
+  }
+}
+
+// Evento de clique
+notificacaoBtn.addEventListener('click', ativarNotificacoes);
+
+// Verificação inicial de permissão
+if (Notification.permission === 'granted') {
+  notificacaoBtn.textContent = '🔔✅';
+  // Inicializa o Firebase Messaging em segundo plano
+  initializeFirebaseMessaging().catch(console.error);
+}
+// Evento de clique
+notificacaoBtn.addEventListener('click', ativarNotificacoes);
+
+// Verifica se já tem permissão
+if (Notification.permission === 'granted') {
+  notificacaoBtn.textContent = '🔔✅';
+}
