@@ -69,39 +69,3 @@ self.addEventListener('activate', (event) => {
     })
   );
 });
-
-// SISTEMA DE NOTIFICAÇÕES
-importScripts('https://www.gstatic.com/firebasejs/10.0.0/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.0.0/firebase-messaging-compat.js');
-
-firebase.initializeApp({
-  apiKey: "AIzaSyArFPaaF04sxtCvqAMtvLCjdgO2i8l33K8",
-  authDomain: "projeto-mais-clareza.firebaseapp.com",
-  projectId: "projeto-mais-clareza",
-  storageBucket: "projeto-mais-clareza.firebasestorage.app",
-  messagingSenderId: "785772047805",
-  appId: "1:785772047805:web:25148daad54b194111b6d4"
-});
-
-const messaging = firebase.messaging();
-
-messaging.onBackgroundMessage((payload) => {
-  console.log('Notificação recebida em background:', payload);
-  
-  const notificationTitle = payload.notification.title;
-  const notificationOptions = {
-    body: payload.notification.body,
-    icon: '/icon-192x192.png',
-    badge: '/badge.png',
-    vibrate: [200, 100, 200]
-  };
-
-  return self.registration.showNotification(notificationTitle, notificationOptions);
-});
-
-self.addEventListener('notificationclick', (event) => {
-  event.notification.close();
-  event.waitUntil(
-    clients.openWindow(event.notification.data?.url || '/')
-  );
-});

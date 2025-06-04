@@ -94,16 +94,6 @@ h1::before {
   z-index: 1001; /* Garante que fique acima de tudo */
 }
 
-/* Botão de notificação alinhado à esquerda */
-.botao-notificacao {
-  position: absolute;
-  left: 15px;
-  background: none;
-  border: none;
-  font-size: 20px;
-  cursor: pointer;
-}
-
 /* Container da logo centralizada */
 .logo-container {
   display: flex;
