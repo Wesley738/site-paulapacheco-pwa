@@ -5,6 +5,64 @@ let tarefasChecklist = JSON.parse(localStorage.getItem('checklist')) || [
   { id: 2, texto: "Beber 2L de água", concluida: false }
 ];
 
+let verificadorAtivo = null;
+let emailLogado = "";
+
+function verificarEmail() {
+  const email = document.getElementById("emailInput").value.trim().toLowerCase();
+  const url = "https://script.google.com/macros/s/AKfycbysCZoR_M2kEVR7VyFUtO6siO_HUfuzOee-MQKbhCC3yvuKpaLj7MawDXutFXNles20Jw/exec?email=" + encodeURIComponent(email);
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (data.erro || !data.ativo || data.ativo.toString().toLowerCase() !== "true") {
+        document.getElementById("mensagemErro").innerText = "Acesso negado: e-mail não cadastrado ou inativo.";
+        return;
+      }
+
+      // Login OK
+      emailLogado = email;
+      document.getElementById("login-box").style.display = "none";
+      document.getElementById("conteudo-sair").style.display = "block";
+      document.getElementById("conteudo").style.display = "block";
+
+      // Inicia checagem a cada 10 segundos
+      if (!verificadorAtivo) {
+        verificadorAtivo = setInterval(verificarAtividade, 10000);
+      }
+    });
+}
+
+function verificarAtividade() {
+  const url = "https://script.google.com/macros/s/AKfycbysCZoR_M2kEVR7VyFUtO6siO_HUfuzOee-MQKbhCC3yvuKpaLj7MawDXutFXNles20Jw/exec?email=" + encodeURIComponent(emailLogado);
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (!data.ativo || data.ativo.toString().toLowerCase() !== "true") {
+        clearInterval(verificadorAtivo);
+        alert("Você foi desconectado. Seu acesso foi desativado pelo administrador.");
+        sair();
+      }
+    });
+}
+
+
+
+function sair() {
+  document.getElementById("conteudo").style.display = "none";
+  document.getElementById("conteudo-sair").style.display = "none";
+  document.getElementById("login-box").style.display = "block";
+  document.getElementById("emailInput").value = "";
+  document.getElementById("mensagemErro").innerText = "";
+  emailLogado = "";
+  
+  if (verificadorAtivo) {
+    clearInterval(verificadorAtivo); // 🔒 para o verificador
+    verificadorAtivo = null;
+  }
+}
+
 // Garante que âncoras não fiquem atrás da barra
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
   anchor.addEventListener('click', function(e) {

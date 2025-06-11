@@ -12,6 +12,45 @@
 
   <link rel="manifest" href="manifest.json" />
   <meta name="theme-color" content="#000000"/>
+  <!-- Auth0 JS SDK -->
+  <script src="https://cdn.auth0.com/js/auth0-spa-js/1.13/auth0-spa-js.production.js"></script>
+  <script>
+    let auth0 = null;
+    const config = {
+      domain: "dev-8i4y2qbymuxpjob4.us.auth0.com",
+      clientId: "Tm3AR9AxRlFwl4VfDLqqJm7OO6H8hZmb"
+    };
+
+    async function initAuth() {
+      auth0 = await createAuth0Client(config);
+
+      const isAuthenticated = await auth0.isAuthenticated();
+      if (isAuthenticated) {
+        const user = await auth0.getUser();
+        verificarAcesso(user.email);
+        return;
+      }
+
+      const query = window.location.search;
+      if (query.includes("code=") && query.includes("state=")) {
+        await auth0.handleRedirectCallback();
+        const user = await auth0.getUser();
+        verificarAcesso(user.email);
+      }
+    }
+
+    async function login() {
+      await auth0.loginWithRedirect({
+        redirect_uri: window.location.origin
+      });
+    }
+
+    async function logout() {
+      auth0.logout({ returnTo: window.location.origin });
+    }
+
+    window.onload = initAuth;
+  </script>
   <script>
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
@@ -24,6 +63,18 @@
   </script>
 </head>
 <body>
+  <div id="conteudo-sair" style="display: none;">
+    <h2>Bem-vindo(a)!</h2>
+    <button onclick="sair()">Sair</button>
+    <!-- Aqui entra o conteúdo do sistema -->
+  </div>
+  <div id="login-box">
+    <h2>🔐 Entrar no Sistema</h2>
+    <input type="email" id="emailInput" placeholder="Digite seu e-mail" />
+    <button onclick="verificarEmail()">Entrar</button>
+    <p id="mensagemErro" style="color:red;"></p>
+  </div>
+  <div id="conteudo" style="display: none;">
   <!-- Barra Superior Fixa -->
   <header class="barra-superior">
     <!-- Logo centralizado -->
@@ -31,261 +82,264 @@
       <img src="logo.png" alt="Logo +Clareza" class="logo">
     </div>
   </header>
-  <section id="metas">
-    <h1>📋 Metas Gerais</h1>
 
-    <div class="caixa-instrucoes">
-      <p>📌 <strong>Como usar:</strong> Defina metas para cada período e pilar. Quando realizar a meta, marque concluído. 
-      Clique em ✏️ para editar ou 🗑️ para excluir.</p>
-    </div>
-    
-    <!-- Formulário para adicionar nova meta -->
-    <div class="adicionar-meta">
-      <input type="text" id="nova-meta" placeholder="Ex: Meditar 15 min/dia">
-      
-      <div class="seletores-container">
-        <select id="pilar">
-          <option value="saude-fisica">💪 Saúde Física</option>
-          <option value="saude-espiritual">🧘 Saúde Espiritual</option>
-          <option value="estudos">📚 Estudos</option>
-          <option value="familia">👨‍👩‍👧‍👦 Relacionamentos</option>
-          <option value="trabalho">💼 Trabalho</option>
-        </select>
-        
-        <select id="periodo">
-          <option value="semanal">📅 Semanal</option>
-          <option value="mensal">🗓️ Mensal</option>
-          <option value="trimestral">⏱️ Trimestral</option>
-          <option value="anual">📅 Anual</option>
-        </select>
-      </div>
-      
-      <button id="btn-adicionar">+</button>
-    </div>
 
-    <!-- Container das metas organizadas por período -->
-    <div class="metas-container">
-      <!-- Semanais -->
-      <div class="periodo-container" id="semanais-container">
-        <h2>📅 Metas Semanais</h2>
-        <div class="lista-metas" data-periodo="semanal"></div>
+    <section id="metas">
+      <h1>📋 Metas Gerais</h1>
+
+      <div class="caixa-instrucoes">
+        <p>📌 <strong>Como usar:</strong> Defina metas para cada período e pilar. Quando realizar a meta, marque concluído. 
+        Clique em ✏️ para editar ou 🗑️ para excluir.</p>
       </div>
       
-      <!-- Mensais -->
-      <div class="periodo-container" id="mensais-container">
-        <h2>🗓️ Metas Mensais</h2>
-        <div class="lista-metas" data-periodo="mensal"></div>
+      <!-- Formulário para adicionar nova meta -->
+      <div class="adicionar-meta">
+        <input type="text" id="nova-meta" placeholder="Ex: Meditar 15 min/dia">
+        
+        <div class="seletores-container">
+          <select id="pilar">
+            <option value="saude-fisica">💪 Saúde Física</option>
+            <option value="saude-espiritual">🧘 Saúde Espiritual</option>
+            <option value="estudos">📚 Estudos</option>
+            <option value="familia">👨‍👩‍👧‍👦 Relacionamentos</option>
+            <option value="trabalho">💼 Trabalho</option>
+          </select>
+          
+          <select id="periodo">
+            <option value="semanal">📅 Semanal</option>
+            <option value="mensal">🗓️ Mensal</option>
+            <option value="trimestral">⏱️ Trimestral</option>
+            <option value="anual">📅 Anual</option>
+          </select>
+        </div>
+        
+        <button id="btn-adicionar">+</button>
+      </div>
+
+      <!-- Container das metas organizadas por período -->
+      <div class="metas-container">
+        <!-- Semanais -->
+        <div class="periodo-container" id="semanais-container">
+          <h2>📅 Metas Semanais</h2>
+          <div class="lista-metas" data-periodo="semanal"></div>
+        </div>
+        
+        <!-- Mensais -->
+        <div class="periodo-container" id="mensais-container">
+          <h2>🗓️ Metas Mensais</h2>
+          <div class="lista-metas" data-periodo="mensal"></div>
+        </div>
+        
+        <!-- Trimestrais -->
+        <div class="periodo-container" id="trimestrais-container">
+          <h2>⏱️ Metas Trimestrais</h2>
+          <div class="lista-metas" data-periodo="trimestral"></div>
+        </div>
+        
+        <!-- Anuais -->
+        <div class="periodo-container" id="anuais-container">
+          <h2>📅 Metas Anuais</h2>
+          <div class="lista-metas" data-periodo="anual"></div>
+        </div>
       </div>
       
-      <!-- Trimestrais -->
-      <div class="periodo-container" id="trimestrais-container">
-        <h2>⏱️ Metas Trimestrais</h2>
-        <div class="lista-metas" data-periodo="trimestral"></div>
+      <div class="limpar-container">
+        <button id="limpar-concluidas">🗑️ Limpar Todas Concluídas</button>
       </div>
-      
-      <!-- Anuais -->
-      <div class="periodo-container" id="anuais-container">
-        <h2>📅 Metas Anuais</h2>
-        <div class="lista-metas" data-periodo="anual"></div>
+    </section>
+    <section id="prioridades" style="display: none;">
+      <h1>🎯 Comece seu dia com Clareza</h1>
+      <div class="caixa-instrucoes">
+        <p>📌 <strong>Como usar:</strong> Defina prioridades, ou seja, atividades que não pode deixar de realizar no dia.
+        Clique no ícone ✅ para confirmar a prioridade. Se quiser editar, clique no ícone ✏️.
+        Abaixo, descreva uma atitude difícil que irá tomar, quer fazer algo ou deixar de fazer algo</p>
       </div>
-    </div>
-    
-    <div class="limpar-container">
-      <button id="limpar-concluidas">🗑️ Limpar Todas Concluídas</button>
-    </div>
-  </section>
-  <section id="prioridades" style="display: none;">
-    <h1>🎯 Comece seu dia com Clareza</h1>
-    <div class="caixa-instrucoes">
-      <p>📌 <strong>Como usar:</strong> Defina prioridades, ou seja, atividades que não pode deixar de realizar no dia.
-      Clique no ícone ✅ para confirmar a prioridade. Se quiser editar, clique no ícone ✏️.
-      Abaixo, descreva uma atitude difícil que irá tomar, quer fazer algo ou deixar de fazer algo</p>
-    </div>
-    <div class="prioridade-container">
-        <!-- Prioridade 1 -->
-        <div class="prioridade-item">
-          <span class="numero-prioridade">1</span>
-          <input type="text" placeholder="Prioridade #1" class="input-prioridade" id="prioridade-1">
-          <div class="acoes-prioridade">
-            <button class="btn-concluir">✅</button>
-            <button class="btn-editar" style="display: none;">✏️</button>
-          </div>
-        </div>
-        
-        <!-- Prioridade 2 -->
-        <div class="prioridade-item">
-          <span class="numero-prioridade">2</span>
-          <input type="text" placeholder="Prioridade #2" class="input-prioridade" id="prioridade-2">
-          <div class="acoes-prioridade">
-            <button class="btn-concluir">✅</button>
-            <button class="btn-editar" style="display: none;">✏️</button>
-          </div>
-        </div>
-        
-        <!-- Prioridade 3 -->
-        <div class="prioridade-item">
-          <span class="numero-prioridade">3</span>
-          <input type="text" placeholder="Prioridade #3" class="input-prioridade" id="prioridade-3">
-          <div class="acoes-prioridade">
-            <button class="btn-concluir">✅</button>
-            <button class="btn-editar" style="display: none;">✏️</button>
-          </div>
-        </div>
-        
-        <!-- Ato Heróico -->
-        <div class="ato-heroico">
-          <h3>🏆 Ato Heróico de Hoje</h3>
-          <div class="ato-heroico-container">
-            <textarea id="ato-heroico-texto" placeholder="Qual será seu ato heróico hoje?" class="input-ato-heroico"></textarea>
-            <div class="ato-heroico-botoes">
-              <button class="btn-concluir-ato" id="btn-concluir-ato">✅ Concluir Edição</button>
-              <button class="btn-editar-ato" id="btn-editar-ato" style="display: none;">✏️ Editar</button>
+      <div class="prioridade-container">
+          <!-- Prioridade 1 -->
+          <div class="prioridade-item">
+            <span class="numero-prioridade">1</span>
+            <input type="text" placeholder="Prioridade #1" class="input-prioridade" id="prioridade-1">
+            <div class="acoes-prioridade">
+              <button class="btn-concluir">✅</button>
+              <button class="btn-editar" style="display: none;">✏️</button>
             </div>
           </div>
           
-          <div class="confirmacao-ato" id="confirmacao-ato" style="display: none;">
-            <p>Você conseguiu realizar esse ato heroico?</p>
-            <div class="botoes-confirmacao">
-              <button class="btn-sim" id="btn-sim">👍 Sim</button>
-              <button class="btn-nao" id="btn-nao">👎 Não</button>
+          <!-- Prioridade 2 -->
+          <div class="prioridade-item">
+            <span class="numero-prioridade">2</span>
+            <input type="text" placeholder="Prioridade #2" class="input-prioridade" id="prioridade-2">
+            <div class="acoes-prioridade">
+              <button class="btn-concluir">✅</button>
+              <button class="btn-editar" style="display: none;">✏️</button>
             </div>
           </div>
           
-          <div id="relatorios-ato-heroico" class="relatorios-container">
-            <!-- Relatórios serão inseridos aqui dinamicamente -->
+          <!-- Prioridade 3 -->
+          <div class="prioridade-item">
+            <span class="numero-prioridade">3</span>
+            <input type="text" placeholder="Prioridade #3" class="input-prioridade" id="prioridade-3">
+            <div class="acoes-prioridade">
+              <button class="btn-concluir">✅</button>
+              <button class="btn-editar" style="display: none;">✏️</button>
+            </div>
+          </div>
+          
+          <!-- Ato Heróico -->
+          <div class="ato-heroico">
+            <h3>🏆 Ato Heróico de Hoje</h3>
+            <div class="ato-heroico-container">
+              <textarea id="ato-heroico-texto" placeholder="Qual será seu ato heróico hoje?" class="input-ato-heroico"></textarea>
+              <div class="ato-heroico-botoes">
+                <button class="btn-concluir-ato" id="btn-concluir-ato">✅ Concluir Edição</button>
+                <button class="btn-editar-ato" id="btn-editar-ato" style="display: none;">✏️ Editar</button>
+              </div>
+            </div>
+            
+            <div class="confirmacao-ato" id="confirmacao-ato" style="display: none;">
+              <p>Você conseguiu realizar esse ato heroico?</p>
+              <div class="botoes-confirmacao">
+                <button class="btn-sim" id="btn-sim">👍 Sim</button>
+                <button class="btn-nao" id="btn-nao">👎 Não</button>
+              </div>
+            </div>
+            
+            <div id="relatorios-ato-heroico" class="relatorios-container">
+              <!-- Relatórios serão inseridos aqui dinamicamente -->
+            </div>
+          </div>
+      </div>
+    </section>
+    <section id="checklist" style="display: none;">
+      <h1>✅ Checklist Diário</h1>
+      <div class="caixa-instrucoes">
+        <p>📌 <strong>Como usar:</strong> Defina atividades a serem realizadas no seu dia e clique em "Adicionar Tarefa". Há atividades de exemplo, mas pode editar ou apagar se quiser.
+        Clique na caixinha cinza quando concluir. Se quiser editar a atividade clique no ícone ✏️. Se quiser apagar, clique no ícone 🗑️</p>
+      </div>
+      <div class="checklist-container">
+        <ul class="tarefas-lista" id="lista-tarefas">
+          <!-- Dinâmico via JS -->
+        </ul>
+        
+        <div class="acoes-checklist">
+          <button id="btn-add-tarefa">➕ Adicionar Tarefa</button>
+          <button id="btn-limpar-concluidas">🗑️ Limpar Concluídas</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Seção Reflexão -->
+    <section id="reflexao">
+      <h1>💭 Reflexão Diária</h1>
+      <div class="caixa-instrucoes">
+        <p>📌 <strong>Como usar:</strong> Lembre de coisas que gostaria de agradecer no dia. Abaixo, defina acertos e erros do dia, pontos que deve melhorar, hábitos que deve manter e assim por diante.
+        Quando preencher, clique em ✅ Concluído. Se quiser editar, clique em ✏️ Editar. 
+        Quando terminar de preencher as caixas clique em "💯 Concluir Diagnóstico", então será gerado um diagnóstico do dia abaixo, onde pode sempre rever futuramente.
+      Para apagar os diagnósticos gerados e dar espaço a outros, clique no botão 💣
+    IMPORTANTE: Para poupar espaço de memória, é interessante que apague periódicamente (Ex: de 30 em 30 dias)</p>
+      </div>
+      <div class="diagnostico-caixa">
+        <div class="diagnostico-cabecalho">
+          <h2>🙏 Agradecimentos</h2>
+          <div class="diagnostico-botoes">
+            <!-- Botão de Concluir VISÍVEL por padrão -->
+            <button class="btn-concluir-diagnostico">✅ Concluído</button>
+            <!-- Botão de Editar OCULTO por padrão -->
+            <button class="btn-editar-diagnostico" style="display: none;">✏️ Editar</button>
           </div>
         </div>
-    </div>
-  </section>
-  <section id="checklist" style="display: none;">
-    <h1>✅ Checklist Diário</h1>
-    <div class="caixa-instrucoes">
-      <p>📌 <strong>Como usar:</strong> Defina atividades a serem realizadas no seu dia e clique em "Adicionar Tarefa". Há atividades de exemplo, mas pode editar ou apagar se quiser.
-      Clique na caixinha cinza quando concluir. Se quiser editar a atividade clique no ícone ✏️. Se quiser apagar, clique no ícone 🗑️</p>
-    </div>
-    <div class="checklist-container">
-      <ul class="tarefas-lista" id="lista-tarefas">
-        <!-- Dinâmico via JS -->
-      </ul>
+        <textarea id="agradecimentos" placeholder="Pelo que você é grato hoje?"></textarea>
+      </div>
+
+      <div class="diagnostico-caixa">
+        <div class="diagnostico-cabecalho">
+          <h2>🔍 Pontos Fortes e Fracos</h2>
+          <div class="diagnostico-botoes">
+            <!-- Botão de Concluir VISÍVEL por padrão -->
+            <button class="btn-concluir-diagnostico">✅ Concluído</button>
+            <!-- Botão de Editar OCULTO por padrão -->
+            <button class="btn-editar-diagnostico" style="display: none;">✏️ Editar</button>
+          </div>
+        </div>
+        <textarea id="melhorias" placeholder="O que fiz de Bom? O que fiz de Ruim? O que posso melhorar amanhã?"></textarea>
+      </div>
+
+      <div class="diagnostico-acoes">
+        <button id="btn-finalizar-diagnostico">💯 Concluir Diagnóstico</button>
+      </div>
+
+      <!-- Botão Flutuante Limpar Tudo -->
+      <button id="btn-nuclear" title="Zerar diagnósticos">💣</button>
+
+      <!-- Container de Relatórios -->
+      <div id="container-relatorios">
+        <!-- Os relatórios serão gerados aqui dinamicamente -->
+      </div>
+    </section>
+    <!-- Seção Leitura -->
+    <section id="leitura" style="display: none;">
+      <h1>📚 Leitura</h1>
+      <div class="caixa-instrucoes">
+        <p>📌 <strong>Como usar:</strong> Adicione os livros que está lendo com as datas de início e meta de término. 
+        Quando terminar, preencha a data de conclusão para comparar com sua meta. Clique em ✏️ para editar ou 🗑️ para remover.</p>
+      </div>
       
-      <div class="acoes-checklist">
-        <button id="btn-add-tarefa">➕ Adicionar Tarefa</button>
-        <button id="btn-limpar-concluidas">🗑️ Limpar Concluídas</button>
+      <!-- Formulário para adicionar novo livro -->
+      <div class="adicionar-livro">
+        <input type="text" id="titulo-livro" placeholder="Título do Livro" class="input-livro">
+        <div class="data-container">
+          <input type="date" id="data-inicio" class="input-livro">
+          <span class="data-legenda">Data de início da leitura</span>
+        </div>
+        <div class="data-container">
+          <input type="date" id="data-meta" class="input-livro">
+          <span class="data-legenda">Meta de término</span>
+        </div>
+        <button id="btn-adicionar-livro">+ Adicionar</button>
       </div>
-    </div>
-  </section>
-
-  <!-- Seção Reflexão -->
-  <section id="reflexao">
-    <h1>💭 Reflexão Diária</h1>
-    <div class="caixa-instrucoes">
-      <p>📌 <strong>Como usar:</strong> Lembre de coisas que gostaria de agradecer no dia. Abaixo, defina acertos e erros do dia, pontos que deve melhorar, hábitos que deve manter e assim por diante.
-      Quando preencher, clique em ✅ Concluído. Se quiser editar, clique em ✏️ Editar. 
-      Quando terminar de preencher as caixas clique em "💯 Concluir Diagnóstico", então será gerado um diagnóstico do dia abaixo, onde pode sempre rever futuramente.
-    Para apagar os diagnósticos gerados e dar espaço a outros, clique no botão 💣
-  IMPORTANTE: Para poupar espaço de memória, é interessante que apague periódicamente (Ex: de 30 em 30 dias)</p>
-    </div>
-    <div class="diagnostico-caixa">
-      <div class="diagnostico-cabecalho">
-        <h2>🙏 Agradecimentos</h2>
-        <div class="diagnostico-botoes">
-          <!-- Botão de Concluir VISÍVEL por padrão -->
-          <button class="btn-concluir-diagnostico">✅ Concluído</button>
-          <!-- Botão de Editar OCULTO por padrão -->
-          <button class="btn-editar-diagnostico" style="display: none;">✏️ Editar</button>
+      
+      <!-- Lista de livros -->
+      <div class="lista-livros" id="lista-livros">
+        <!-- Dinâmico (gerado via JavaScript) -->
+      </div>
+      
+      <!-- Modal para marcar como concluído -->
+      <div class="modal-conclusao" id="modal-conclusao" style="display: none;">
+        <div class="modal-conteudo">
+          <h3>Concluir Livro: <span id="modal-titulo-livro"></span></h3>
+          <label for="data-conclusao">Data de Conclusão:</label>
+          <input type="date" id="data-conclusao">
+          <div class="modal-botoes">
+            <button id="btn-confirmar-conclusao">✅ Confirmar</button>
+            <button id="btn-cancelar-conclusao">❌ Cancelar</button>
+          </div>
         </div>
       </div>
-      <textarea id="agradecimentos" placeholder="Pelo que você é grato hoje?"></textarea>
-    </div>
-
-    <div class="diagnostico-caixa">
-      <div class="diagnostico-cabecalho">
-        <h2>🔍 Pontos Fortes e Fracos</h2>
-        <div class="diagnostico-botoes">
-          <!-- Botão de Concluir VISÍVEL por padrão -->
-          <button class="btn-concluir-diagnostico">✅ Concluído</button>
-          <!-- Botão de Editar OCULTO por padrão -->
-          <button class="btn-editar-diagnostico" style="display: none;">✏️ Editar</button>
-        </div>
-      </div>
-      <textarea id="melhorias" placeholder="O que fiz de Bom? O que fiz de Ruim? O que posso melhorar amanhã?"></textarea>
-    </div>
-
-    <div class="diagnostico-acoes">
-      <button id="btn-finalizar-diagnostico">💯 Concluir Diagnóstico</button>
-    </div>
-
-    <!-- Botão Flutuante Limpar Tudo -->
-    <button id="btn-nuclear" title="Zerar diagnósticos">💣</button>
-
-    <!-- Container de Relatórios -->
-    <div id="container-relatorios">
-      <!-- Os relatórios serão gerados aqui dinamicamente -->
-    </div>
-  </section>
-  <!-- Seção Leitura -->
-  <section id="leitura" style="display: none;">
-    <h1>📚 Leitura</h1>
-    <div class="caixa-instrucoes">
-      <p>📌 <strong>Como usar:</strong> Adicione os livros que está lendo com as datas de início e meta de término. 
-      Quando terminar, preencha a data de conclusão para comparar com sua meta. Clique em ✏️ para editar ou 🗑️ para remover.</p>
-    </div>
-    
-    <!-- Formulário para adicionar novo livro -->
-    <div class="adicionar-livro">
-      <input type="text" id="titulo-livro" placeholder="Título do Livro" class="input-livro">
-      <div class="data-container">
-        <input type="date" id="data-inicio" class="input-livro">
-        <span class="data-legenda">Data de início da leitura</span>
-      </div>
-      <div class="data-container">
-        <input type="date" id="data-meta" class="input-livro">
-        <span class="data-legenda">Meta de término</span>
-      </div>
-      <button id="btn-adicionar-livro">+ Adicionar</button>
-    </div>
-    
-    <!-- Lista de livros -->
-    <div class="lista-livros" id="lista-livros">
-      <!-- Dinâmico (gerado via JavaScript) -->
-    </div>
-    
-    <!-- Modal para marcar como concluído -->
-    <div class="modal-conclusao" id="modal-conclusao" style="display: none;">
-      <div class="modal-conteudo">
-        <h3>Concluir Livro: <span id="modal-titulo-livro"></span></h3>
-        <label for="data-conclusao">Data de Conclusão:</label>
-        <input type="date" id="data-conclusao">
-        <div class="modal-botoes">
-          <button id="btn-confirmar-conclusao">✅ Confirmar</button>
-          <button id="btn-cancelar-conclusao">❌ Cancelar</button>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- Barra de Navegação (Instagram Style) -->
-    <nav class="nav-inferior">
-        <a href="#metas" class="nav-item">
-            <span>📅</span>
-            <span class="nav-texto">Metas Gerais</span>
-        </a>
-        <a href="#prioridades" class="nav-item">
-            <span>🎯</span>
-            <span class="nav-texto">Prioridades</span>
-        </a>
-        <a href="#checklist" class="nav-item">
-            <span>✅</span>
-            <span class="nav-texto">Checklist</span>
-        </a>
-        <a href="#leitura" class="nav-item">
-            <span>📚</span>
-            <span class="nav-texto">Leitura</span>
-        </a>
-        <a href="#reflexao" class="nav-item">
-            <span>💭</span>
-            <span class="nav-texto">Reflexão</span>
-        </a>
-    </nav>
-  <script src="script.js"></script>
+    </section>
+    <!-- Barra de Navegação (Instagram Style) -->
+      <nav class="nav-inferior">
+          <a href="#metas" class="nav-item">
+              <span>📅</span>
+              <span class="nav-texto">Metas Gerais</span>
+          </a>
+          <a href="#prioridades" class="nav-item">
+              <span>🎯</span>
+              <span class="nav-texto">Prioridades</span>
+          </a>
+          <a href="#checklist" class="nav-item">
+              <span>✅</span>
+              <span class="nav-texto">Checklist</span>
+          </a>
+          <a href="#leitura" class="nav-item">
+              <span>📚</span>
+              <span class="nav-texto">Leitura</span>
+          </a>
+          <a href="#reflexao" class="nav-item">
+              <span>💭</span>
+              <span class="nav-texto">Reflexão</span>
+          </a>
+      </nav>
+    <script src="script.js"></script>
+  </div>
 </body>
 </html>
