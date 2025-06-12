@@ -1,3 +1,11 @@
+window.onload = () => {
+  const emailSalvo = localStorage.getItem("emailLogado");
+  if (emailSalvo) {
+    emailLogado = emailSalvo;
+    verificarAtividade(true); // força verificação inicial
+  }
+};
+
 // Dados salvos (mantendo suas variáveis existentes)
 let metas = JSON.parse(localStorage.getItem('metas')) || [];
 let tarefasChecklist = JSON.parse(localStorage.getItem('checklist')) || [
@@ -22,6 +30,7 @@ function verificarEmail() {
 
       // Login OK
       emailLogado = email;
+      localStorage.setItem("emailLogado", email);
       document.getElementById("login-box").style.display = "none";
       document.getElementById("conteudo-sair").style.display = "block";
       document.getElementById("conteudo").style.display = "block";
@@ -33,20 +42,29 @@ function verificarEmail() {
     });
 }
 
-function verificarAtividade() {
+function verificarAtividade(inicial = false) {
   const url = "https://script.google.com/macros/s/AKfycbysCZoR_M2kEVR7VyFUtO6siO_HUfuzOee-MQKbhCC3yvuKpaLj7MawDXutFXNles20Jw/exec?email=" + encodeURIComponent(emailLogado);
 
   fetch(url)
     .then(res => res.json())
     .then(data => {
       if (!data.ativo || data.ativo.toString().toLowerCase() !== "true") {
-        clearInterval(verificadorAtivo);
-        alert("Você foi desconectado. Seu acesso foi desativado pelo administrador.");
+        if (!inicial) alert("Você foi desconectado. Seu acesso foi desativado pelo administrador.");
         sair();
+        return;
+      }
+
+      // Se for carregamento inicial, mostra o conteúdo
+      if (inicial) {
+        document.getElementById("login-box").style.display = "none";
+        document.getElementById("conteudo").style.display = "block";
+
+        if (!verificadorAtivo) {
+          verificadorAtivo = setInterval(verificarAtividade, 10000);
+        }
       }
     });
 }
-
 
 
 function sair() {
@@ -56,6 +74,7 @@ function sair() {
   document.getElementById("emailInput").value = "";
   document.getElementById("mensagemErro").innerText = "";
   emailLogado = "";
+  localStorage.removeItem("emailLogado");
   
   if (verificadorAtivo) {
     clearInterval(verificadorAtivo); // 🔒 para o verificador
