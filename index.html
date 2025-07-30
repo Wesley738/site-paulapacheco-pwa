@@ -94,7 +94,7 @@
       
       <!-- Formulário para adicionar nova meta -->
       <div class="adicionar-meta">
-        <input type="text" id="nova-meta" placeholder="Ex: Meditar 15 min/dia">
+        <textarea id="nova-meta" rows="1" placeholder="Digite sua meta..."></textarea>
         
         <div class="seletores-container">
           <select id="pilar">
@@ -152,13 +152,13 @@
       <div class="caixa-instrucoes">
         <p>📌 <strong>Como usar:</strong> Defina prioridades, ou seja, atividades que não pode deixar de realizar no dia.
         Clique no ícone ✅ para confirmar a prioridade. Se quiser editar, clique no ícone ✏️.
-        Abaixo, descreva uma atitude difícil que irá tomar, quer fazer algo ou deixar de fazer algo</p>
+        Abaixo, descreva uma atitude difícil que irá tomar, quer fazer algo ou deixar de fazer algo. No botão 💣 você pode limpar os relatórios e assim economizar armazenamento no seu dispositivo</p>
       </div>
       <div class="prioridade-container">
           <!-- Prioridade 1 -->
           <div class="prioridade-item">
             <span class="numero-prioridade">1</span>
-            <input type="text" placeholder="Prioridade #1" class="input-prioridade" id="prioridade-1">
+            <textarea class="input-prioridade" rows="1" placeholder="Prioridade #1"></textarea>
             <div class="acoes-prioridade">
               <button class="btn-concluir">✅</button>
               <button class="btn-editar" style="display: none;">✏️</button>
@@ -168,7 +168,7 @@
           <!-- Prioridade 2 -->
           <div class="prioridade-item">
             <span class="numero-prioridade">2</span>
-            <input type="text" placeholder="Prioridade #2" class="input-prioridade" id="prioridade-2">
+            <textarea class="input-prioridade" rows="1" placeholder="Prioridade #2"></textarea>
             <div class="acoes-prioridade">
               <button class="btn-concluir">✅</button>
               <button class="btn-editar" style="display: none;">✏️</button>
@@ -178,7 +178,7 @@
           <!-- Prioridade 3 -->
           <div class="prioridade-item">
             <span class="numero-prioridade">3</span>
-            <input type="text" placeholder="Prioridade #3" class="input-prioridade" id="prioridade-3">
+            <textarea class="input-prioridade" rows="1" placeholder="Prioridade #3"></textarea>
             <div class="acoes-prioridade">
               <button class="btn-concluir">✅</button>
               <button class="btn-editar" style="display: none;">✏️</button>
@@ -191,7 +191,7 @@
             <div class="ato-heroico-container">
               <textarea id="ato-heroico-texto" placeholder="Qual será seu ato heróico hoje?" class="input-ato-heroico"></textarea>
               <div class="ato-heroico-botoes">
-                <button class="btn-concluir-ato" id="btn-concluir-ato">✅ Concluir Edição</button>
+                <button class="btn-concluir-ato" id="btn-concluir-ato">✅ Concluir</button>
                 <button class="btn-editar-ato" id="btn-editar-ato" style="display: none;">✏️ Editar</button>
               </div>
             </div>
@@ -204,6 +204,10 @@
               </div>
             </div>
             
+            <!-- Botão para limpar os relatórios de Ato Heroico -->
+            <div class="limpar-container">
+              <button id="btn-limpar-ato-heroico" title="Zerar atos heroicos">💣</button>
+            </div>
             <div id="relatorios-ato-heroico" class="relatorios-container">
               <!-- Relatórios serão inseridos aqui dinamicamente -->
             </div>
@@ -235,8 +239,7 @@
         <p>📌 <strong>Como usar:</strong> Lembre de coisas que gostaria de agradecer no dia. Abaixo, defina acertos e erros do dia, pontos que deve melhorar, hábitos que deve manter e assim por diante.
         Quando preencher, clique em ✅ Concluído. Se quiser editar, clique em ✏️ Editar. 
         Quando terminar de preencher as caixas clique em "💯 Concluir Diagnóstico", então será gerado um diagnóstico do dia abaixo, onde pode sempre rever futuramente.
-      Para apagar os diagnósticos gerados e dar espaço a outros, clique no botão 💣
-    IMPORTANTE: Para poupar espaço de memória, é interessante que apague periódicamente (Ex: de 30 em 30 dias)</p>
+      No botão 💣 você pode limpar os diagnósticos gerados e assim economizar armazenamento no seu dispositivo</p>
       </div>
       <div class="diagnostico-caixa">
         <div class="diagnostico-cabecalho">
@@ -281,27 +284,31 @@
       <h1>📚 Leitura</h1>
       <div class="caixa-instrucoes">
         <p>📌 <strong>Como usar:</strong> Adicione os livros que está lendo com as datas de início e meta de término. 
-        Quando terminar, preencha a data de conclusão para comparar com sua meta. Clique em ✏️ para editar ou 🗑️ para remover.</p>
+        Quando terminar, preencha a data de conclusão para comparar com sua meta. Clique em ✏️ para editar ou 🗑️ para remover.
+      No botão 💣 você pode limpar os livros adicionados e assim economizar armazenamento no seu dispositivo</p>
       </div>
       
       <!-- Formulário para adicionar novo livro -->
       <div class="adicionar-livro">
-        <input type="text" id="titulo-livro" placeholder="Título do Livro" class="input-livro">
-        <div class="data-container">
-          <input type="date" id="data-inicio" class="input-livro">
-          <span class="data-legenda">Data de início da leitura</span>
+        <div class="grupo-leitura">
+          <input type="text" id="titulo-livro" placeholder="Título do Livro" class="input-livro">
+          <div class="data-container">
+            <input type="date" id="data-inicio" class="input-livro hoje">
+            <span class="data-legenda">Data de início da leitura</span>
+          </div>
+          <div class="data-container">
+            <input type="date" id="data-meta" class="input-livro">
+            <span class="data-legenda">Meta de término</span>
+          </div>
+          <button id="btn-adicionar-livro">+ Adicionar</button>
         </div>
-        <div class="data-container">
-          <input type="date" id="data-meta" class="input-livro">
-          <span class="data-legenda">Meta de término</span>
-        </div>
-        <button id="btn-adicionar-livro">+ Adicionar</button>
       </div>
       
       <!-- Lista de livros -->
       <div class="lista-livros" id="lista-livros">
         <!-- Dinâmico (gerado via JavaScript) -->
       </div>
+      <button id="btn-limpar-livros" title="Limpar todos os livros">💣</button>
       
       <!-- Modal para marcar como concluído -->
       <div class="modal-conclusao" id="modal-conclusao" style="display: none;">

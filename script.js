@@ -6,6 +6,57 @@ window.onload = () => {
   }
 };
 
+let livros = [];
+
+function obterDataHojeBR() {
+  const hoje = new Date();
+  const dia = String(hoje.getDate()).padStart(2, '0');
+  const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+  const ano = hoje.getFullYear();
+  return `${dia}/${mes}/${ano}`;
+}
+
+window.addEventListener('load', () => {
+  const dataHojeBR = obterDataHojeBR();
+  const dataHojeISO = new Date().toISOString().split('T')[0];
+
+  // 1. Preenche spans com a data atual no formato DD/MM/AAAA
+  document.querySelectorAll('.data-hoje').forEach(el => {
+    el.textContent = dataHojeBR;
+  });
+
+  // 2. Preenche inputs do tipo date com a data atual (YYYY-MM-DD)
+  document.querySelectorAll('input[type="date"].hoje').forEach(el => {
+    if (!el.value) el.value = dataHojeISO;
+  });
+
+  carregarPrioridades();
+
+  const salvo = localStorage.getItem("atoHeroicoTexto");
+  if (salvo) {
+    textareaAtoHeroico.value = salvo;
+    textareaAtoHeroico.setAttribute("readonly", true);
+    btnConcluirAto.style.display = "none";
+    btnEditarAto.style.display = "block";
+  }
+
+  renderizarChecklist();
+
+  // 📚 Inicializar botão "Adicionar Livro" com segurança
+  const btnAdicionarLivro = document.getElementById('btn-adicionar-livro');
+  if (btnAdicionarLivro) {
+    btnAdicionarLivro.addEventListener('click', adicionarLivro);
+  }
+
+  // Garantir que a lista seja carregada
+  carregarLivros();
+
+  // Inicializa
+  renderizarMetas();
+
+  renderizarRelatorios();
+});
+
 // Dados salvos (mantendo suas variáveis existentes)
 let metas = JSON.parse(localStorage.getItem('metas')) || [];
 let tarefasChecklist = JSON.parse(localStorage.getItem('checklist')) || [
@@ -158,6 +209,15 @@ document.getElementById('limpar-concluidas').addEventListener('click', () => {
     renderizarMetas();
   }
 });
+
+const novaMetaTextarea = document.getElementById('nova-meta');
+
+if (novaMetaTextarea) {
+  novaMetaTextarea.addEventListener('input', () => {
+    novaMetaTextarea.style.height = 'auto'; // Reseta altura
+    novaMetaTextarea.style.height = novaMetaTextarea.scrollHeight + 'px'; // Ajusta altura
+  });
+}
 
 // Configura o botão "+"
 document.getElementById('btn-adicionar').addEventListener('click', function() {
@@ -373,6 +433,27 @@ document.querySelectorAll('.prioridade-item').forEach(item => {
   });
 });
 
+function configurarAutoexpansaoPrioridades() {
+  const campos = document.querySelectorAll('.input-prioridade');
+
+  campos.forEach(campo => {
+    // Expande automaticamente se já tiver texto
+    campo.style.height = 'auto';
+    campo.style.height = campo.scrollHeight + 'px';
+
+    // Expande conforme o usuário digita
+    campo.addEventListener('input', () => {
+      campo.style.height = 'auto';
+      campo.style.height = campo.scrollHeight + 'px';
+    });
+  });
+}
+
+// Chama após o carregamento da página
+window.addEventListener('load', () => {
+  configurarAutoexpansaoPrioridades();
+});
+
 function salvarPrioridades() {
   const prioridades = [];
   
@@ -409,7 +490,36 @@ function carregarPrioridades() {
   });
 }
 
-window.addEventListener('load', carregarPrioridades);
+// Salvando Ato Heroico
+const textareaAtoHeroico = document.getElementById("ato-heroico-texto");
+const btnConcluirAto = document.getElementById("btn-concluir-ato");
+const btnEditarAto = document.getElementById("btn-editar-ato");
+
+// Evento para salvar o conteúdo
+btnConcluirAto.addEventListener("click", () => {
+  textareaAtoHeroico.setAttribute("readonly", true);
+  btnConcluirAto.style.display = "none";
+  btnEditarAto.style.display = "block";
+  localStorage.setItem("atoHeroicoTexto", textareaAtoHeroico.value);
+});
+
+// Evento para permitir edição novamente
+btnEditarAto.addEventListener("click", () => {
+  textareaAtoHeroico.removeAttribute("readonly");
+  btnEditarAto.style.display = "none";
+  btnConcluirAto.style.display = "block";
+  textareaAtoHeroico.focus();
+});
+
+// Função para limpar os relatórios de Ato Heroico
+document.getElementById('btn-limpar-ato-heroico').addEventListener('click', () => {
+  if (confirm('💣 Isso apagará TODOS os relatórios de atos heroicos. Deseja continuar?')) {
+    localStorage.removeItem('relatoriosAtoHeroico');
+    document.getElementById('relatorios-ato-heroico').innerHTML = '';
+    resetarAtoHeroico();
+    alert('Todos os atos heroicos foram removidos!');
+  }
+});
 
 function renderizarChecklist() {
   const lista = document.getElementById('lista-tarefas');
@@ -442,6 +552,7 @@ function renderizarChecklist() {
   // Atualiza eventos
   atualizarEventosChecklist();
 }
+
 
 function atualizarEventosChecklist() {
   // Checkbox - Concluir
@@ -511,14 +622,6 @@ function salvarChecklist() {
   localStorage.setItem('checklist', JSON.stringify(tarefasChecklist));
 }
 
-// Inicialização
-window.addEventListener('load', () => {
-  renderizarChecklist();
-});
-
-// Inicializa
-renderizarMetas();
-
 document.querySelectorAll('.diagnostico-caixa').forEach(caixa => {
   const textarea = caixa.querySelector('textarea');
   const btnEditar = caixa.querySelector('.btn-editar-diagnostico');
@@ -552,6 +655,7 @@ document.querySelectorAll('.diagnostico-caixa').forEach(caixa => {
 function criarRelatorio(diagnostico) {
   return `
     <div class="relatorio" data-timestamp="${diagnostico.timestamp}">
+      <button class="btn-excluir-relatorio" title="Excluir diagnóstico" onclick="excluirDiagnostico(${diagnostico.id})">🗑️</button>
       <h3 class="relatorio-titulo">Diagnóstico - ${diagnostico.data}</h3>
       <div class="relatorio-item">
         <h4>🙏 Agradecimentos:</h4>
@@ -563,6 +667,18 @@ function criarRelatorio(diagnostico) {
       </div>
     </div>
   `;
+}
+
+function excluirDiagnostico(id) {
+  if (!confirm("Deseja realmente excluir este diagnóstico?")) return;
+
+  let relatorios = JSON.parse(localStorage.getItem('historicoDiagnosticos')) || [];
+
+  // Garante que a comparação seja feita entre tipos iguais
+  relatorios = relatorios.filter(r => String(r.id) !== String(id));
+
+  localStorage.setItem('historicoDiagnosticos', JSON.stringify(relatorios));
+  renderizarRelatorios();
 }
 
 // Função para renderizar TODOS os relatórios (do mais novo pro mais antigo)
@@ -583,6 +699,7 @@ document.getElementById('btn-finalizar-diagnostico').addEventListener('click', (
   if (!confirm('Finalizar diagnóstico e gerar relatório?')) return;
 
   const novoDiagnostico = {
+    id: Date.now(),
     data: new Date().toLocaleString('pt-BR', {
       day: '2-digit',
       month: '2-digit',
@@ -615,17 +732,13 @@ document.getElementById('btn-nuclear').addEventListener('click', () => {
   }
 });
 
-// Carrega ao iniciar
-window.addEventListener('load', renderizarRelatorios);
-
 // Seção Leitura - Variáveis
-let livros = JSON.parse(localStorage.getItem('livros')) || [];
+localStorage.setItem("livrosLeitura", JSON.stringify(livros));
 
 // Elementos da seção Leitura
 const tituloLivroInput = document.getElementById('titulo-livro');
 const dataInicioInput = document.getElementById('data-inicio');
 const dataMetaInput = document.getElementById('data-meta');
-const btnAdicionarLivro = document.getElementById('btn-adicionar-livro');
 const listaDeLivros = document.getElementById('lista-livros');
 const modalConclusao = document.getElementById('modal-conclusao');
 const modalTituloLivro = document.getElementById('modal-titulo-livro');
@@ -639,7 +752,6 @@ const hojeISO = hoje.toISOString().split('T')[0];
 dataInicioInput.value = hojeISO;
 
 // Event Listeners para Leitura
-btnAdicionarLivro.addEventListener('click', adicionarLivro);
 btnConfirmarConclusao.addEventListener('click', confirmarConclusao);
 btnCancelarConclusao.addEventListener('click', () => {
   modalConclusao.style.display = 'none';
@@ -815,7 +927,8 @@ function salvarLivros() {
 }
 
 function carregarLivros() {
-  livros = JSON.parse(localStorage.getItem('livros')) || [];
+  livros = JSON.parse(localStorage.getItem("livrosLeitura")) || [];
+  livros.forEach(livro => adicionarLivroNaLista(livro));
   renderizarLivros();
 }
 
@@ -859,10 +972,7 @@ const RELATORIOS_KEY = 'relatoriosAtoHeroico';
 function carregarRelatorios() {
   const relatoriosContainer = document.getElementById('relatorios-ato-heroico');
   const relatoriosSalvos = JSON.parse(localStorage.getItem(RELATORIOS_KEY)) || [];
-  
-  // Limpar relatórios antigos (mais de 30 dias)
-  const trintaDiasAtras = new Date();
-  trintaDiasAtras.setDate(trintaDiasAtras.getDate() - 30);
+  relatoriosSalvos.forEach(r => adicionarRelatorio(r.mensagem, r.texto, r.tipo, r.data))
   
   const relatoriosAtualizados = relatoriosSalvos.filter(relatorio => {
     const dataRelatorio = new Date(relatorio.data);
@@ -906,6 +1016,7 @@ function criarElementoRelatorio(relatorio) {
 // Função para salvar relatório
 function salvarRelatorio(resultado) {
   const atoHeroicoTexto = document.getElementById('ato-heroico-texto').value;
+
   if (!atoHeroicoTexto.trim()) return;
   
   const relatoriosSalvos = JSON.parse(localStorage.getItem(RELATORIOS_KEY)) || [];
@@ -924,6 +1035,66 @@ function salvarRelatorio(resultado) {
   carregarRelatorios();
 }
 
+function adicionarRelatorio(mensagem, texto, tipo, data = new Date()) {
+  const container = document.getElementById("relatorios-ato-heroico");
+
+  const div = document.createElement("div");
+  div.className = `relatorio ${tipo}`;
+
+  const dataFormatada = new Date(data).toLocaleDateString("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric"
+  });
+
+  div.innerHTML = `
+    <p class="data-relatorio">${dataFormatada}</p>
+    <p class="ato-texto"><strong>${texto}</strong></p>
+    <p class="mensagem-resultado">${mensagem}</p>
+    <button class="btn-remover-relatorio">🗑️</button>
+    <hr>
+  `;
+
+  // Adicionar ao DOM
+  container.appendChild(div);
+
+  // Evento para remover individualmente
+  div.querySelector(".btn-remover-relatorio").addEventListener("click", () => {
+    div.remove();
+    removerRelatorioDoLocalStorage(dataFormatada, texto, mensagem, tipo);
+  });
+
+  // Salvar no localStorage
+  const relatoriosSalvos = JSON.parse(localStorage.getItem("relatoriosAtoHeroico")) || [];
+  relatoriosSalvos.push({ mensagem, texto, tipo, data });
+  localStorage.setItem("relatoriosAtoHeroico", JSON.stringify(relatoriosSalvos));
+}
+
+function removerRelatorioDoLocalStorage(data, texto, mensagem, tipo) {
+    const relatoriosSalvos = JSON.parse(localStorage.getItem("relatoriosAtoHeroico")) || [];
+    const novos = relatoriosSalvos.filter(r => {
+      const dataRel = new Date(r.data).toLocaleDateString("pt-BR");
+      return !(r.texto === texto && r.mensagem === mensagem && r.tipo === tipo && dataRel === data);
+    });
+    localStorage.setItem("relatoriosAtoHeroico", JSON.stringify(novos));
+}
+
+function resetarAtoHeroico() {
+  const textarea = document.getElementById("ato-heroico-texto");
+  const btnConcluir = document.getElementById("btn-concluir-ato");
+  const btnEditar = document.getElementById("btn-editar-ato");
+  const confirmacaoDiv = document.getElementById("confirmacao-ato");
+
+  textarea.removeAttribute("readonly");
+  textarea.value = "";
+  btnEditar.style.display = "none";
+  btnConcluir.style.display = "block";
+  confirmacaoDiv.style.display = "none";
+
+  // Remover do localStorage também
+  localStorage.removeItem("atoHeroicoTexto");
+}
+
 // Event Listeners
 document.addEventListener('DOMContentLoaded', function() {
   // Carregar relatórios ao iniciar
@@ -932,12 +1103,35 @@ document.addEventListener('DOMContentLoaded', function() {
   // Elementos
   const btnConcluirAto = document.getElementById('btn-concluir-ato');
   const btnEditarAto = document.getElementById('btn-editar-ato');
-  const atoHeroicoTexto = document.getElementById('ato-heroico-texto');
   const confirmacaoAto = document.getElementById('confirmacao-ato');
   const btnSim = document.getElementById('btn-sim');
   const btnNao = document.getElementById('btn-nao');
   const relatoriosContainer = document.getElementById('relatorios-ato-heroico');
   
+  const atoHeroicoTexto = document.getElementById('ato-heroico-texto');
+  // Ajusta dinamicamente a altura do textarea conforme o conteúdo
+  atoHeroicoTexto.addEventListener("input", () => {
+    atoHeroicoTexto.style.height = "auto"; // Resetar primeiro
+    atoHeroicoTexto.style.height = atoHeroicoTexto.scrollHeight + "px";
+  });
+
+  const agradecimentosTextarea = document.getElementById("agradecimentos");
+  const melhoriasTextarea = document.getElementById("melhorias");
+
+  [agradecimentosTextarea, melhoriasTextarea].forEach(textarea => {
+    if (textarea) {
+      // Altura dinâmica
+      textarea.addEventListener("input", () => {
+        textarea.style.height = "auto";
+        textarea.style.height = textarea.scrollHeight + "px";
+      });
+
+      // Ajuste inicial ao carregar
+      textarea.style.height = "auto";
+      textarea.style.height = textarea.scrollHeight + "px";
+    }
+  });
+
   // Concluir edição do ato heroico
   btnConcluirAto.addEventListener('click', function() {
     if (!atoHeroicoTexto.value.trim()) {
@@ -960,17 +1154,35 @@ document.addEventListener('DOMContentLoaded', function() {
     btnEditarAto.style.display = 'none';
     confirmacaoAto.style.display = 'none';
   });
-  
+
   // Botão Sim (conseguiu realizar)
-  btnSim.addEventListener('click', function() {
-    salvarRelatorio('sim');
-    confirmacaoAto.style.display = 'none';
+  btnSim.addEventListener("click", () => {
+    const texto = atoHeroicoTexto.value.trim();
+    if (!texto) {
+      alert("Você precisa escrever um ato heroico antes!");
+      return;
+    }
+    if (!atoHeroicoTexto.hasAttribute("readonly")) {
+      alert("Conclua a edição do ato heroico antes de confirmar.");
+      return;
+    }
+    adicionarRelatorio("Você REALIZOU o ato heroico!", texto, "positivo");
+    resetarAtoHeroico();
   });
   
   // Botão Não (não conseguiu realizar)
-  btnNao.addEventListener('click', function() {
-    salvarRelatorio('nao');
-    confirmacaoAto.style.display = 'none';
+  btnNao.addEventListener("click", () => {
+    const texto = atoHeroicoTexto.value.trim();
+    if (!texto) {
+      alert("Você precisa escrever um ato heroico antes!");
+      return;
+    }
+    if (!atoHeroicoTexto.hasAttribute("readonly")) {
+      alert("Conclua a edição do ato heroico antes de confirmar.");
+      return;
+    }
+    adicionarRelatorio("Você NÃO realizou o ato heroico!", texto, "negativo");
+    resetarAtoHeroico();
   });
   
   // Delegar evento para botões de excluir (que são dinâmicos)
@@ -1000,4 +1212,18 @@ document.addEventListener('DOMContentLoaded', function() {
       confirmacaoAto.style.display = 'none';
     }
   });
+
+  // Botão limpar todos os livros
+  const btnLimparLivros = document.getElementById("btn-limpar-livros");
+
+  if (btnLimparLivros) {
+    btnLimparLivros.addEventListener("click", () => {
+      if (confirm("💣 Tem certeza que deseja apagar todos os livros?")) {
+        localStorage.removeItem("livrosLeitura");
+        livros = [];
+        document.getElementById("lista-livros").innerHTML = "";
+        alert("Todos os livros foram apagados!");
+      }
+    });
+  }
 });
