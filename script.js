@@ -70,10 +70,23 @@ let emailLogado = "";
 function verificarEmail() {
   const email = document.getElementById("emailInput").value.trim().toLowerCase();
   const url = "https://script.google.com/macros/s/AKfycbysCZoR_M2kEVR7VyFUtO6siO_HUfuzOee-MQKbhCC3yvuKpaLj7MawDXutFXNles20Jw/exec?email=" + encodeURIComponent(email);
+  const mensagemErro = document.getElementById("mensagemErro");
+  const btnLogin = document.getElementById("btn-login");
+  const btnTexto = document.getElementById("btn-login-texto");
+  const spinner = document.getElementById("spinner-login");
+  
+  mensagemErro.textContent = "";
+  btnLogin.disabled = true;
+  btnTexto.textContent = "Verificando...";
+  spinner.style.display = "inline-block";
 
   fetch(url)
     .then(res => res.json())
     .then(data => {
+      spinner.style.display = "none";
+      btnLogin.disabled = false;
+      btnTexto.textContent = "Entrar";
+
       if (data.erro || !data.ativo || data.ativo.toString().toLowerCase() !== "true") {
         document.getElementById("mensagemErro").innerText = "Acesso negado: e-mail não cadastrado ou inativo.";
         return;
@@ -90,7 +103,14 @@ function verificarEmail() {
       if (!verificadorAtivo) {
         verificadorAtivo = setInterval(verificarAtividade, 10000);
       }
-    });
+    })
+    
+    .catch(() => {
+      spinner.style.display = "none";
+      btnLogin.disabled = false;
+      btnTexto.textContent = "Entrar";
+      mensagemErro.textContent = "Erro ao verificar. Tente novamente.";
+    })    
 }
 
 function verificarAtividade(inicial = false) {
@@ -248,6 +268,18 @@ document.getElementById('btn-adicionar').addEventListener('click', function() {
 
 // Função para renderizar metas (atualizada)
 function renderizarMetas() {
+  
+  // Atualiza botão de limpar concluídas
+  const totalConcluidas = metas.filter(m => m.concluida).length;
+  const btnLimpar = document.getElementById('limpar-concluidas');
+  
+  if (totalConcluidas > 0) {
+    btnLimpar.style.display = 'flex';
+    btnLimpar.innerHTML = `🗑️ Limpar Todas Concluídas (${totalConcluidas})`;
+  } else {
+    btnLimpar.style.display = 'none';
+  }
+
   // Limpa todos os containers de metas primeiro
   document.querySelectorAll('.lista-metas').forEach(container => {
     container.innerHTML = '';
@@ -355,16 +387,6 @@ function renderizarMetas() {
     }
   }
 
-  // Atualiza botão de limpar concluídas
-  const totalConcluidas = metas.filter(m => m.concluida).length;
-  const btnLimpar = document.getElementById('limpar-concluidas');
-  
-  if (totalConcluidas > 0) {
-    btnLimpar.style.display = 'flex';
-    btnLimpar.innerHTML = `🗑️ Limpar Todas Concluídas (${totalConcluidas})`;
-  } else {
-    btnLimpar.style.display = 'none';
-  }
 }
 
 
@@ -733,7 +755,7 @@ document.getElementById('btn-nuclear').addEventListener('click', () => {
 });
 
 // Seção Leitura - Variáveis
-localStorage.setItem("livrosLeitura", JSON.stringify(livros));
+livros = JSON.parse(localStorage.getItem("livrosLeitura")) || [];
 
 // Elementos da seção Leitura
 const tituloLivroInput = document.getElementById('titulo-livro');
@@ -923,7 +945,7 @@ function removerLivro(id) {
 }
 
 function salvarLivros() {
-  localStorage.setItem('livros', JSON.stringify(livros));
+  localStorage.setItem('livrosLeitura', JSON.stringify(livros));
 }
 
 function carregarLivros() {

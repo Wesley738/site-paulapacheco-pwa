@@ -71,7 +71,10 @@
   <div id="login-box">
     <h2>🔐 Entrar no Sistema</h2>
     <input type="email" id="emailInput" placeholder="Digite seu e-mail" />
-    <button onclick="verificarEmail()">Entrar</button>
+    <button onclick="verificarEmail()" id="btn-login">
+      <span id="btn-login-texto">Entrar</span>
+      <span class="spinner" id="spinner-login" style="display: none;"></span>
+    </button>
     <p id="mensagemErro" style="color:red;"></p>
   </div>
   <div id="conteudo" style="display: none;">
@@ -94,9 +97,9 @@
       
       <!-- Formulário para adicionar nova meta -->
       <div class="adicionar-meta">
-        <textarea id="nova-meta" rows="1" placeholder="Digite sua meta..."></textarea>
-        
         <div class="seletores-container">
+          <textarea id="nova-meta" rows="1" placeholder="Digite sua meta..."></textarea>
+        
           <select id="pilar">
             <option value="saude-fisica">💪 Saúde Física</option>
             <option value="saude-espiritual">🧘 Saúde Espiritual</option>

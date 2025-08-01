@@ -283,7 +283,6 @@ section {
   border: 1px solid #ddd;
   border-radius: 5px;
   background: white;
-  margin-bottom: 5px;
 }
 
 #btn-adicionar {
@@ -294,6 +293,8 @@ section {
   padding: 2px 15px;
   cursor: pointer;
   font-size: 30px;
+  margin-top: 10px;
+  margin-bottom: 10px;
 }
 
 /* Lista de Metas */
@@ -616,8 +617,8 @@ section {
 
 #btn-limpar-ato-heroico, #btn-limpar-livros, #btn-nuclear{
   position: fixed;
-  bottom: 67px;
-  right: 20px;
+  bottom: 80px;
+  right: 9px;
   font-size: 1.5rem;
   background: #d68e08;
   color: white;
@@ -729,6 +730,8 @@ section {
   background: #f8f9fa;
   border: 1px solid #e74c3c;
   color: #e74c3c;
+  bottom: 79px;
+  right: 7px;
 }
 
 /* --- REFLEXÃO --- */
@@ -1506,4 +1509,21 @@ section {
 
 .relatorio .btn-remover-relatorio:hover {
   background: #eb7062;
+}
+
+.spinner {
+  border: 3px solid #ccc;
+  border-top: 3px solid #444;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.7s linear infinite;
+  margin-left: 8px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
