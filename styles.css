@@ -124,31 +124,6 @@ h1::before {
   font-size: 14px;
 }
 
-#conteudo-sair {
-  text-align: center;
-  padding-top: 30px;
-}
-
-#conteudo-sair h2 {
-  font-size: 24px;
-  margin-bottom: 10px;
-}
-
-#conteudo-sair button {
-  background-color: #444;
-  color: white;
-  border: none;
-  padding: 8px 20px;
-  border-radius: 20px;
-  font-size: 15px;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-#conteudo-sair button:hover {
-  background-color: #222;
-}
-
 /* Estilos para a barra superior fixa */
 .barra-superior {
   position: fixed;
@@ -778,7 +753,7 @@ section {
   font-size: 0.9rem;
 }
 
-.btn-excluir-relatorio {
+.btn-excluir-diagnostico {
   position: absolute;
   top: 8px;
   right: 8px;
@@ -786,7 +761,6 @@ section {
   border: none;
   font-size: 1.2em;
   cursor: pointer;
-  color: #c00;
 }
 
 .relatorio-diagnostico {
@@ -861,7 +835,7 @@ section {
   gap: 15px;
 }
 
-.relatorio {
+.relatorio { 
   background: #f9f9f9;
   padding: 12px;
   margin-bottom: 15px;
@@ -1460,7 +1434,7 @@ section {
   text-align: right;
 }
 
-.btn-excluir-relatorio {
+.btn-excluir-diagnostico {
   background: none;
   border: none;
   cursor: pointer;
@@ -1468,7 +1442,7 @@ section {
   color: #999;
 }
 
-.btn-excluir-relatorio:hover {
+.btn-excluir-diagnostico:hover {
   color: #ff6b6b;
 }
 

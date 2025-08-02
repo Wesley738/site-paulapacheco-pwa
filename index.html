@@ -63,11 +63,6 @@
   </script>
 </head>
 <body>
-  <div id="conteudo-sair" style="display: none;">
-    <h2>Bem-vindo(a)!</h2>
-    <button onclick="sair()">Sair</button>
-    <!-- Aqui entra o conteúdo do sistema -->
-  </div>
   <div id="login-box">
     <h2>🔐 Entrar no Sistema</h2>
     <input type="email" id="emailInput" placeholder="Digite seu e-mail" />
@@ -249,9 +244,9 @@
           <h2>🙏 Agradecimentos</h2>
           <div class="diagnostico-botoes">
             <!-- Botão de Concluir VISÍVEL por padrão -->
-            <button class="btn-concluir-diagnostico">✅ Concluído</button>
+            <button class="btn-concluir-diagnostico" id="btn-concluir-agradecimentos" >✅ Concluído</button>
             <!-- Botão de Editar OCULTO por padrão -->
-            <button class="btn-editar-diagnostico" style="display: none;">✏️ Editar</button>
+            <button class="btn-editar-diagnostico" id="btn-editar-agradecimentos" style="display: none;">✏️ Editar</button>
           </div>
         </div>
         <textarea id="agradecimentos" placeholder="Pelo que você é grato hoje?"></textarea>
@@ -262,9 +257,9 @@
           <h2>🔍 Pontos Fortes e Fracos</h2>
           <div class="diagnostico-botoes">
             <!-- Botão de Concluir VISÍVEL por padrão -->
-            <button class="btn-concluir-diagnostico">✅ Concluído</button>
+            <button class="btn-concluir-diagnostico" id="btn-concluir-melhorias">✅ Concluído</button>
             <!-- Botão de Editar OCULTO por padrão -->
-            <button class="btn-editar-diagnostico" style="display: none;">✏️ Editar</button>
+            <button class="btn-editar-diagnostico" id="btn-editar-melhorias" style="display: none;">✏️ Editar</button>
           </div>
         </div>
         <textarea id="melhorias" placeholder="O que fiz de Bom? O que fiz de Ruim? O que posso melhorar amanhã?"></textarea>

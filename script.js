@@ -97,7 +97,6 @@ function verificarEmail() {
       emailLogado = email;
       localStorage.setItem("emailLogado", email);
       document.getElementById("login-box").style.display = "none";
-      document.getElementById("conteudo-sair").style.display = "block";
       document.getElementById("conteudo").style.display = "block";
 
       // Inicia checagem a cada 10 segundos
@@ -141,7 +140,6 @@ function verificarAtividade(inicial = false) {
 
 function sair() {
   document.getElementById("conteudo").style.display = "none";
-  document.getElementById("conteudo-sair").style.display = "none";
   document.getElementById("login-box").style.display = "block";
   document.getElementById("emailInput").value = "";
   document.getElementById("mensagemErro").innerText = "";
@@ -678,7 +676,7 @@ document.querySelectorAll('.diagnostico-caixa').forEach(caixa => {
 function criarRelatorio(diagnostico) {
   return `
     <div class="relatorio" data-timestamp="${diagnostico.timestamp}">
-      <button class="btn-excluir-relatorio" title="Excluir diagnóstico" onclick="excluirDiagnostico(${diagnostico.id})">🗑️</button>
+      <button class="btn-excluir-diagnostico" title="Excluir diagnóstico" onclick="excluirDiagnostico(${diagnostico.id})">🗑️</button>
       <h3 class="relatorio-titulo">Diagnóstico - ${diagnostico.data}</h3>
       <div class="relatorio-item">
         <h4>🙏 Agradecimentos:</h4>
@@ -695,12 +693,12 @@ function criarRelatorio(diagnostico) {
 function excluirDiagnostico(id) {
   if (!confirm("Deseja realmente excluir este diagnóstico?")) return;
 
-  let relatorios = JSON.parse(localStorage.getItem('historicoDiagnosticos')) || [];
+  let diagnosticos = JSON.parse(localStorage.getItem('historicoDiagnosticos')) || [];
 
   // Garante que a comparação seja feita entre tipos iguais
-  relatorios = relatorios.filter(r => String(r.id) !== String(id));
+  diagnosticos = diagnosticos.filter(r => String(r.id) !== String(id));
 
-  localStorage.setItem('historicoDiagnosticos', JSON.stringify(relatorios));
+  localStorage.setItem('historicoDiagnosticos', JSON.stringify(diagnosticos));
   renderizarRelatorios();
 }
 
@@ -752,6 +750,27 @@ document.getElementById('btn-nuclear').addEventListener('click', () => {
     localStorage.removeItem('historicoDiagnosticos');
     document.getElementById('container-relatorios').innerHTML = '';
     alert('Todos os diagnósticos foram removidos!');
+
+    // Restaura agradecimentos para modo edição
+    const agradecimentos = document.getElementById("agradecimentos");
+    const btnConcluirA = document.getElementById("btn-concluir-agradecimentos");
+    const btnEditarA = document.getElementById("btn-editar-agradecimentos");
+
+    agradecimentos.removeAttribute("readonly");
+    btnConcluirA.style.display = "inline-block";
+    btnEditarA.style.display = "none";
+
+    // Restaura melhorias para modo edição
+    const melhorias = document.getElementById("melhorias");
+    const btnConcluirM = document.getElementById("btn-concluir-melhorias");
+    const btnEditarM = document.getElementById("btn-editar-melhorias");
+
+    melhorias.removeAttribute("readonly");
+    btnConcluirM.style.display = "inline-block";
+    btnEditarM.style.display = "none";
+
+    agradecimentos.value = '';
+    melhorias.value = '';
   }
 });
 
@@ -1013,6 +1032,7 @@ function exibirRelatorio(mensagem, texto, tipo, data = new Date()) {
   container.appendChild(div);
 
   div.querySelector(".btn-remover-relatorio").addEventListener("click", () => {
+    if (!confirm("Deseja realmente excluir este relatório?")) return;
     div.remove();
     removerRelatorioDoLocalStorage(data, texto, mensagem, tipo);
   });
@@ -1167,7 +1187,7 @@ document.addEventListener('DOMContentLoaded', function() {
   
   // Delegar evento para botões de excluir (que são dinâmicos)
   relatoriosContainer.addEventListener('click', function(e) {
-    if (e.target.classList.contains('btn-excluir-relatorio')) {
+    if (e.target.classList.contains('btn-excluir-diagnostico')) {
       const idRelatorio = e.target.getAttribute('data-id');
       const relatoriosSalvos = JSON.parse(localStorage.getItem(RELATORIOS_KEY)) || [];
       
