@@ -7,6 +7,8 @@ window.onload = () => {
 };
 
 let livros = [];
+let metas = JSON.parse(localStorage.getItem('metas')) || [];
+let prioridades = JSON.parse(localStorage.getItem('prioridades')) || [];
 
 function obterDataHojeBR() {
   const hoje = new Date();
@@ -58,7 +60,6 @@ window.addEventListener('load', () => {
 });
 
 // Dados salvos (mantendo suas variáveis existentes)
-let metas = JSON.parse(localStorage.getItem('metas')) || [];
 let tarefasChecklist = JSON.parse(localStorage.getItem('checklist')) || [
   { id: 1, texto: "Meditar por 10 minutos", concluida: false },
   { id: 2, texto: "Beber 2L de água", concluida: false }
@@ -950,7 +951,6 @@ function salvarLivros() {
 
 function carregarLivros() {
   livros = JSON.parse(localStorage.getItem("livrosLeitura")) || [];
-  livros.forEach(livro => adicionarLivroNaLista(livro));
   renderizarLivros();
 }
 
@@ -990,74 +990,7 @@ function getStatusLivro(livro) {
 let atoHeroicoEditavel = true;
 const RELATORIOS_KEY = 'relatoriosAtoHeroico';
 
-// Função para carregar relatórios do localStorage
-function carregarRelatorios() {
-  const relatoriosContainer = document.getElementById('relatorios-ato-heroico');
-  const relatoriosSalvos = JSON.parse(localStorage.getItem(RELATORIOS_KEY)) || [];
-  relatoriosSalvos.forEach(r => adicionarRelatorio(r.mensagem, r.texto, r.tipo, r.data))
-  
-  const relatoriosAtualizados = relatoriosSalvos.filter(relatorio => {
-    const dataRelatorio = new Date(relatorio.data);
-    return dataRelatorio >= trintaDiasAtras;
-  });
-  
-  // Salvar relatórios filtrados
-  if (relatoriosSalvos.length !== relatoriosAtualizados.length) {
-    localStorage.setItem(RELATORIOS_KEY, JSON.stringify(relatoriosAtualizados));
-  }
-  
-  // Exibir relatórios
-  relatoriosContainer.innerHTML = '';
-  relatoriosAtualizados.forEach(relatorio => {
-    const relatorioItem = criarElementoRelatorio(relatorio);
-    relatoriosContainer.appendChild(relatorioItem);
-  });
-}
-
-// Função para criar elemento de relatório
-function criarElementoRelatorio(relatorio) {
-  const relatorioDiv = document.createElement('div');
-  relatorioDiv.className = 'relatorio-item';
-  
-  const dataParaExibir = new Date(relatorio.data).toLocaleDateString('pt-BR');
-  
-  relatorioDiv.innerHTML = `
-    <div class="relatorio-data">${dataParaExibir}</div>
-    <div class="relatorio-ato">${relatorio.ato}</div>
-    <div class="relatorio-resultado ${relatorio.resultado}">
-      Você ${relatorio.resultado === 'sim' ? 'conseguiu' : 'não conseguiu'} realizar
-    </div>
-    <div class="relatorio-acoes">
-      <button class="btn-excluir-relatorio" data-id="${relatorio.id}">🗑️</button>
-    </div>
-  `;
-  
-  return relatorioDiv;
-}
-
-// Função para salvar relatório
-function salvarRelatorio(resultado) {
-  const atoHeroicoTexto = document.getElementById('ato-heroico-texto').value;
-
-  if (!atoHeroicoTexto.trim()) return;
-  
-  const relatoriosSalvos = JSON.parse(localStorage.getItem(RELATORIOS_KEY)) || [];
-  
-  const novoRelatorio = {
-    id: Date.now().toString(),
-    data: new Date().toISOString(),
-    ato: atoHeroicoTexto,
-    resultado: resultado
-  };
-  
-  relatoriosSalvos.unshift(novoRelatorio); // Adiciona no início do array
-  localStorage.setItem(RELATORIOS_KEY, JSON.stringify(relatoriosSalvos));
-  
-  // Recarregar relatórios
-  carregarRelatorios();
-}
-
-function adicionarRelatorio(mensagem, texto, tipo, data = new Date()) {
+function exibirRelatorio(mensagem, texto, tipo, data = new Date()) {
   const container = document.getElementById("relatorios-ato-heroico");
 
   const div = document.createElement("div");
@@ -1077,28 +1010,53 @@ function adicionarRelatorio(mensagem, texto, tipo, data = new Date()) {
     <hr>
   `;
 
-  // Adicionar ao DOM
   container.appendChild(div);
 
-  // Evento para remover individualmente
   div.querySelector(".btn-remover-relatorio").addEventListener("click", () => {
     div.remove();
-    removerRelatorioDoLocalStorage(dataFormatada, texto, mensagem, tipo);
+    removerRelatorioDoLocalStorage(data, texto, mensagem, tipo);
   });
+}
 
-  // Salvar no localStorage
+// Cria e exibe um novo relatório
+function adicionarRelatorio(mensagem, texto, tipo, data = new Date()) {
+  exibirRelatorio(mensagem, texto, tipo, data); // Só exibe
+
+  // E salva no localStorage
   const relatoriosSalvos = JSON.parse(localStorage.getItem("relatoriosAtoHeroico")) || [];
   relatoriosSalvos.push({ mensagem, texto, tipo, data });
   localStorage.setItem("relatoriosAtoHeroico", JSON.stringify(relatoriosSalvos));
 }
 
+// Carrega todos os relatórios já salvos
+function carregarRelatorios() {
+  const container = document.getElementById("relatorios-ato-heroico");
+  container.innerHTML = "";
+
+  const relatoriosSalvos = JSON.parse(localStorage.getItem("relatoriosAtoHeroico")) || [];
+
+  relatoriosSalvos.forEach(({ mensagem, texto, tipo, data }) => {
+    exibirRelatorio(mensagem, texto, tipo, data); // 👈 Corrigido aqui!
+  });
+}
+
+// Remove relatório do localStorage com base no conteúdo
 function removerRelatorioDoLocalStorage(data, texto, mensagem, tipo) {
-    const relatoriosSalvos = JSON.parse(localStorage.getItem("relatoriosAtoHeroico")) || [];
-    const novos = relatoriosSalvos.filter(r => {
-      const dataRel = new Date(r.data).toLocaleDateString("pt-BR");
-      return !(r.texto === texto && r.mensagem === mensagem && r.tipo === tipo && dataRel === data);
-    });
-    localStorage.setItem("relatoriosAtoHeroico", JSON.stringify(novos));
+  const relatoriosSalvos = JSON.parse(localStorage.getItem("relatoriosAtoHeroico")) || [];
+
+  const dataISO = new Date(data).toISOString(); // Garantir formato comparável
+
+  const atualizados = relatoriosSalvos.filter(r => {
+    const rDataISO = new Date(r.data).toISOString();
+    return !(
+      rDataISO === dataISO &&
+      r.texto === texto &&
+      r.mensagem === mensagem &&
+      r.tipo === tipo
+    );
+  });
+
+  localStorage.setItem("relatoriosAtoHeroico", JSON.stringify(atualizados));
 }
 
 function resetarAtoHeroico() {
