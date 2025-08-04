@@ -56,7 +56,7 @@ window.addEventListener('load', () => {
   // Inicializa
   renderizarMetas();
 
-  renderizarRelatorios();
+  renderizarDiagnosticos();
 });
 
 // Dados salvos (mantendo suas variáveis existentes)
@@ -496,13 +496,13 @@ function salvarPrioridades() {
 
 function carregarPrioridades() {
   const prioridadesSalvas = JSON.parse(localStorage.getItem('prioridades')) || [];
-  
+
   prioridadesSalvas.forEach(prioridade => {
     const input = document.getElementById(prioridade.id);
     if (!input) return;
-    
+
     input.value = prioridade.texto;
-    
+
     if (prioridade.concluida) {
       input.classList.add('bloqueado');
       input.closest('.prioridade-item').querySelector('.btn-concluir').style.display = 'none';
@@ -666,25 +666,21 @@ document.querySelectorAll('.diagnostico-caixa').forEach(caixa => {
     btnEditar.style.display = 'none';
     btnConcluir.style.display = 'block';
   });
-
-  // Carrega dados salvos
-  const salvo = localStorage.getItem(textarea.id);
-  if (salvo) textarea.value = salvo;
 });
 
 // Função para criar um relatório HTML
-function criarRelatorio(diagnostico) {
+function criarDiagnostico(diagnostico) {
   return `
     <div class="relatorio" data-timestamp="${diagnostico.timestamp}">
       <button class="btn-excluir-diagnostico" title="Excluir diagnóstico" onclick="excluirDiagnostico(${diagnostico.id})">🗑️</button>
-      <h3 class="relatorio-titulo">Diagnóstico - ${diagnostico.data}</h3>
-      <div class="relatorio-item">
+      <h3 class="diagnostico-titulo">Diagnóstico - ${diagnostico.data}</h3>
+      <div class="diagnostico-item">
         <h4>🙏 Agradecimentos:</h4>
-        <p>${diagnostico.agradecimentos || "Nenhum registro"}</p>
+        <p class="diagnostico-texto">${diagnostico.agradecimentos || "Nenhum registro"}</p>
       </div>
-      <div class="relatorio-item">
-        <h4>🔍 Preciso Melhorar:</h4>
-        <p>${diagnostico.melhorias || "Nenhum registro"}</p>
+      <div class="diagnostico-item">
+        <h4>🔍 Pontos Fortes e Fracos:</h4>
+        <p class="diagnostico-texto">${diagnostico.melhorias || "Nenhum registro"}</p>
       </div>
     </div>
   `;
@@ -699,25 +695,25 @@ function excluirDiagnostico(id) {
   diagnosticos = diagnosticos.filter(r => String(r.id) !== String(id));
 
   localStorage.setItem('historicoDiagnosticos', JSON.stringify(diagnosticos));
-  renderizarRelatorios();
+  renderizarDiagnosticos();
 }
 
 // Função para renderizar TODOS os relatórios (do mais novo pro mais antigo)
-function renderizarRelatorios() {
-  const container = document.getElementById('container-relatorios');
+function renderizarDiagnosticos() {
+  const container = document.getElementById('container-diagnosticos');
   const historico = JSON.parse(localStorage.getItem('historicoDiagnosticos')) || [];
   
   container.innerHTML = '';
   
   // Ordena do mais recente pro mais antigo
   historico.sort((a, b) => b.timestamp - a.timestamp).forEach(diagnostico => {
-    container.innerHTML += criarRelatorio(diagnostico);
+    container.innerHTML += criarDiagnostico(diagnostico);
   });
 }
 
 // Função para adicionar novo diagnóstico
 document.getElementById('btn-finalizar-diagnostico').addEventListener('click', () => {
-  if (!confirm('Finalizar diagnóstico e gerar relatório?')) return;
+  if (!confirm('Finalizar edição e gerar diagnóstico?')) return;
 
   const novoDiagnostico = {
     id: Date.now(),
@@ -738,17 +734,36 @@ document.getElementById('btn-finalizar-diagnostico').addEventListener('click', (
   historico.push(novoDiagnostico);
   localStorage.setItem('historicoDiagnosticos', JSON.stringify(historico));
 
+  // Restaura agradecimentos para modo edição
+  const agradecimentos = document.getElementById("agradecimentos");
+  const btnConcluirA = document.getElementById("btn-concluir-agradecimentos");
+  const btnEditarA = document.getElementById("btn-editar-agradecimentos");
+
+  agradecimentos.removeAttribute("readonly");
+  btnConcluirA.style.display = "inline-block";
+  btnEditarA.style.display = "none";
+
+  // Restaura melhorias para modo edição
+  const melhorias = document.getElementById("melhorias");
+  const btnConcluirM = document.getElementById("btn-concluir-melhorias");
+  const btnEditarM = document.getElementById("btn-editar-melhorias");
+
+  melhorias.removeAttribute("readonly");
+  btnConcluirM.style.display = "inline-block";
+  btnEditarM.style.display = "none";
+
   // Limpa campos e renderiza
   document.getElementById('agradecimentos').value = '';
   document.getElementById('melhorias').value = '';
-  renderizarRelatorios();
+  // document.getElementById
+  renderizarDiagnosticos();
 });
 
 // Botão Nuclear (limpar TUDO)
 document.getElementById('btn-nuclear').addEventListener('click', () => {
   if (confirm('💣 ATENÇÃO! Isso apagará TODOS os diagnósticos. Continuar?')) {
     localStorage.removeItem('historicoDiagnosticos');
-    document.getElementById('container-relatorios').innerHTML = '';
+    document.getElementById('container-diagnosticos').innerHTML = '';
     alert('Todos os diagnósticos foram removidos!');
 
     // Restaura agradecimentos para modo edição
@@ -821,7 +836,7 @@ function adicionarLivro() {
     status: 'em-andamento' // em-andamento, concluído, atrasado
   };
 
-  livros.push(novoLivro);
+  livros.unshift(novoLivro);
   salvarLivros();
   renderizarLivros();
 
@@ -946,6 +961,7 @@ function editarLivro(id) {
   const livro = livros.find(l => l.id === id);
   if (!livro) return;
 
+  tituloLivroInput.focus();
   tituloLivroInput.value = livro.titulo;
   dataInicioInput.value = livro.dataInicio;
   dataMetaInput.value = livro.dataMeta;
@@ -1029,7 +1045,7 @@ function exibirRelatorio(mensagem, texto, tipo, data = new Date()) {
     <hr>
   `;
 
-  container.appendChild(div);
+  container.prepend(div);
 
   div.querySelector(".btn-remover-relatorio").addEventListener("click", () => {
     if (!confirm("Deseja realmente excluir este relatório?")) return;
@@ -1044,7 +1060,7 @@ function adicionarRelatorio(mensagem, texto, tipo, data = new Date()) {
 
   // E salva no localStorage
   const relatoriosSalvos = JSON.parse(localStorage.getItem("relatoriosAtoHeroico")) || [];
-  relatoriosSalvos.push({ mensagem, texto, tipo, data });
+  relatoriosSalvos.unshift({ mensagem, texto, tipo, data });
   localStorage.setItem("relatoriosAtoHeroico", JSON.stringify(relatoriosSalvos));
 }
 
@@ -1055,8 +1071,8 @@ function carregarRelatorios() {
 
   const relatoriosSalvos = JSON.parse(localStorage.getItem("relatoriosAtoHeroico")) || [];
 
-  relatoriosSalvos.forEach(({ mensagem, texto, tipo, data }) => {
-    exibirRelatorio(mensagem, texto, tipo, data); // 👈 Corrigido aqui!
+  relatoriosSalvos.reverse().forEach(({ mensagem, texto, tipo, data }) => {
+    exibirRelatorio(mensagem, texto, tipo, data);
   });
 }
 

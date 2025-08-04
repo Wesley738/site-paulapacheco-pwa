@@ -515,7 +515,7 @@ section {
   width: 100%;
   box-sizing: border-box;
   padding: 8px;
-  font-size: 1.1em;
+  font-size: 0.9em;
   border: 1px solid #ccc;
   border-radius: 6px;
   resize: none;
@@ -523,6 +523,18 @@ section {
   transition: height 0.2s ease;
   font-family: Arial, Helvetica, sans-serif;
   min-height: 37px;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  line-height: 1.4; /* ou maior */
+  min-height: calc(1.4em * 2 + 16px); /* 2 linhas + padding */
+}
+
+/* Input bloqueado */
+.input-prioridade.bloqueado {
+  background-color: #f5f5f5;
+  color: #777;
+  border-color: #e0e0e0;
+  pointer-events: none;
 }
 
 .ato-heroico {
@@ -582,13 +594,6 @@ section {
   color: #3498db;
 }
 
-/* Input bloqueado */
-.input-prioridade.bloqueado {
-  background-color: #f5f5f5;
-  color: #777;
-  border-color: #e0e0e0;
-  pointer-events: none;
-}
 
 #btn-limpar-ato-heroico, #btn-limpar-livros, #btn-nuclear{
   position: fixed;
@@ -733,7 +738,7 @@ section {
 
 .diagnostico-cabecalho h2 {
   color: #a36c06;
-  font-size: 1.2rem;
+  font-size: 1.0rem;
   margin: 0;
 }
 
@@ -751,6 +756,12 @@ section {
   font-family: 'Arial', sans-serif;
   resize: vertical;
   font-size: 0.9rem;
+}
+
+.diagnostico-texto {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .btn-excluir-diagnostico {
@@ -828,7 +839,7 @@ section {
 }
 
 /* --- Container de Relatórios --- */
-#container-relatorios {
+#container-diagnosticos {
   margin-top: 20px;
   display: flex;
   flex-direction: column;
@@ -845,7 +856,16 @@ section {
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-.relatorio-titulo {
+.diagnostico-item {
+  background: white;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  border-left: 4px solid #df9b1d;
+}
+
+.diagnostico-titulo {
   color: #2b2d42;
   font-size: 1.1rem;
   margin-top: 0;
@@ -854,13 +874,14 @@ section {
   border-bottom: 1px solid #f0f0f0;
 }
 
-.relatorio-item h4 {
+
+.diagnostico-item h4 {
   color: #c27604;
   font-size: 0.95rem;
-  margin-bottom: 5px;
+  margin-bottom: 4.3px;
 }
 
-.relatorio-item p {
+.diagnostico-item p {
   background: #f8f9fa;
   padding: 12px;
   border-radius: 8px;
@@ -877,18 +898,18 @@ section {
 }
 
 /* Ícones nos títulos (opcional) */
-.relatorio-titulo::before {
+.diagnostico-titulo::before {
   content: "📅 ";
 }
 
-.relatorio-item h4::before {
+.diagnostico-item h4::before {
   content: "• ";
   color: #d68e08;
 }
 
 /* Modo grade (opcional) */
 @media (min-width: 768px) {
-  #container-relatorios {
+  #container-diagnosticos {
     display: flex;
     grid-template-columns: repeat(2, 1fr);
     gap: 20px;
@@ -1003,6 +1024,9 @@ section {
   margin-bottom: 10px;
   font-size: 1.1rem;
   color: #643a02;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .livro-datas {
@@ -1391,14 +1415,6 @@ section {
   background-color: #f5c6cb;
 }
 
-.relatorio-item {
-  background: white;
-  border-radius: 12px;
-  padding: 15px;
-  margin-bottom: 15px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
-  border-left: 4px solid #df9b1d;
-}
 
 .relatorio-data {
   font-size: 0.85rem;
@@ -1455,6 +1471,12 @@ section {
   font-size: 1.1rem;
   font-weight: bold;
   margin: 6px 0;
+}
+
+.ato-texto {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: normal;
 }
 
 .relatorio .mensagem-resultado {

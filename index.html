@@ -83,11 +83,10 @@
 
 
     <section id="metas">
-      <h1>📋 Metas Gerais</h1>
+      <h1>📋 Metas</h1>
 
       <div class="caixa-instrucoes">
-        <p>📌 <strong>Como usar:</strong> Defina metas para cada período e pilar. Quando realizar a meta, marque concluído. 
-        Clique em ✏️ para editar ou 🗑️ para excluir.</p>
+        <p>📌 <strong>Como usar:</strong> Defina metas para cada pilar e período. Clique na caixinha cinza quando concluir. Se quiser editar a atividade clique em ✏️. Se quiser apagar, clique em 🗑️</p>
       </div>
       
       <!-- Formulário para adicionar nova meta -->
@@ -149,14 +148,14 @@
       <h1>🎯 Comece seu dia com Clareza</h1>
       <div class="caixa-instrucoes">
         <p>📌 <strong>Como usar:</strong> Defina prioridades, ou seja, atividades que não pode deixar de realizar no dia.
-        Clique no ícone ✅ para confirmar a prioridade. Se quiser editar, clique no ícone ✏️.
-        Abaixo, descreva uma atitude difícil que irá tomar, quer fazer algo ou deixar de fazer algo. No botão 💣 você pode limpar os relatórios e assim economizar armazenamento no seu dispositivo</p>
+        Clique em ✅ para confirmar a prioridade. Para editar, clique em ✏️.
+        No Ato Heroico descreva uma atitude difícil que irá tomar, quer fazer algo ou deixar de fazer algo. No botão 💣 você pode limpar os relatórios e assim economizar armazenamento no seu dispositivo</p>
       </div>
       <div class="prioridade-container">
           <!-- Prioridade 1 -->
           <div class="prioridade-item">
             <span class="numero-prioridade">1</span>
-            <textarea class="input-prioridade" id="prioridade-1" rows="1" placeholder="Prioridade #1"></textarea>
+            <textarea class="input-prioridade auto-ajuste" id="prioridade-1" rows="2" placeholder="Prioridade #1"></textarea>
             <div class="acoes-prioridade">
               <button class="btn-concluir">✅</button>
               <button class="btn-editar" style="display: none;">✏️</button>
@@ -166,7 +165,7 @@
           <!-- Prioridade 2 -->
           <div class="prioridade-item">
             <span class="numero-prioridade">2</span>
-            <textarea class="input-prioridade" id="prioridade-2" rows="1" placeholder="Prioridade #2"></textarea>
+            <textarea class="input-prioridade auto-ajuste" id="prioridade-2" rows="2" placeholder="Prioridade #2"></textarea>
             <div class="acoes-prioridade">
               <button class="btn-concluir">✅</button>
               <button class="btn-editar" style="display: none;">✏️</button>
@@ -176,7 +175,7 @@
           <!-- Prioridade 3 -->
           <div class="prioridade-item">
             <span class="numero-prioridade">3</span>
-            <textarea class="input-prioridade" id="prioridade-3" rows="1" placeholder="Prioridade #3"></textarea>
+            <textarea class="input-prioridade auto-ajuste" id="prioridade-3" rows="2" placeholder="Prioridade #3"></textarea>
             <div class="acoes-prioridade">
               <button class="btn-concluir">✅</button>
               <button class="btn-editar" style="display: none;">✏️</button>
@@ -185,9 +184,9 @@
           
           <!-- Ato Heróico -->
           <div class="ato-heroico">
-            <h3>🏆 Ato Heróico de Hoje</h3>
+            <h3>🏆 Ato Heroico de Hoje</h3>
             <div class="ato-heroico-container">
-              <textarea id="ato-heroico-texto" placeholder="Qual será seu ato heróico hoje?" class="input-ato-heroico"></textarea>
+              <textarea id="ato-heroico-texto" placeholder="Qual será seu ato heroico hoje?" class="input-ato-heroico"></textarea>
               <div class="ato-heroico-botoes">
                 <button class="btn-concluir-ato" id="btn-concluir-ato">✅ Concluir</button>
                 <button class="btn-editar-ato" id="btn-editar-ato" style="display: none;">✏️ Editar</button>
@@ -213,10 +212,10 @@
       </div>
     </section>
     <section id="checklist" style="display: none;">
-      <h1>✅ Checklist Diário</h1>
+      <h1>✅ Checklist</h1>
       <div class="caixa-instrucoes">
-        <p>📌 <strong>Como usar:</strong> Defina atividades a serem realizadas no seu dia e clique em "Adicionar Tarefa". Há atividades de exemplo, mas pode editar ou apagar se quiser.
-        Clique na caixinha cinza quando concluir. Se quiser editar a atividade clique no ícone ✏️. Se quiser apagar, clique no ícone 🗑️</p>
+        <p>📌 <strong>Como usar:</strong> Clique em "Adicionar Tarefa" para adicionar uma tarefa a ser realizada no dia. Há atividades de exemplo, mas pode editar ou apagar se quiser.
+        Clique na caixinha cinza quando concluir. Se quiser editar a atividade clique em ✏️. Se quiser apagar, clique em 🗑️</p>
       </div>
       <div class="checklist-container">
         <ul class="tarefas-lista" id="lista-tarefas">
@@ -232,10 +231,10 @@
 
     <!-- Seção Reflexão -->
     <section id="reflexao">
-      <h1>💭 Reflexão Diária</h1>
+      <h1>💭 Reflexão</h1>
       <div class="caixa-instrucoes">
-        <p>📌 <strong>Como usar:</strong> Lembre de coisas que gostaria de agradecer no dia. Abaixo, defina acertos e erros do dia, pontos que deve melhorar, hábitos que deve manter e assim por diante.
-        Quando preencher, clique em ✅ Concluído. Se quiser editar, clique em ✏️ Editar. 
+        <p>📌 <strong>Como usar:</strong> Lembre de coisas que gostaria de agradecer no dia. Abaixo, defina acertos e erros do dia.
+        Quando preencher, clique em "✅ Concluído". Se quiser editar, clique em "✏️ Editar". 
         Quando terminar de preencher as caixas clique em "💯 Concluir Diagnóstico", então será gerado um diagnóstico do dia abaixo, onde pode sempre rever futuramente.
       No botão 💣 você pode limpar os diagnósticos gerados e assim economizar armazenamento no seu dispositivo</p>
       </div>
@@ -273,7 +272,7 @@
       <button id="btn-nuclear" title="Zerar diagnósticos">💣</button>
 
       <!-- Container de Relatórios -->
-      <div id="container-relatorios">
+      <div id="container-diagnosticos">
         <!-- Os relatórios serão gerados aqui dinamicamente -->
       </div>
     </section>
