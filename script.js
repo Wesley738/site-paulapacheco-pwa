@@ -229,13 +229,21 @@ document.getElementById('limpar-concluidas').addEventListener('click', () => {
   }
 });
 
+// Quebras de Linhas
 const novaMetaTextarea = document.getElementById('nova-meta');
-
 if (novaMetaTextarea) {
   novaMetaTextarea.addEventListener('input', () => {
     novaMetaTextarea.style.height = 'auto'; // Reseta altura
     novaMetaTextarea.style.height = novaMetaTextarea.scrollHeight + 'px'; // Ajusta altura
   });
+}
+
+const novoLivroTextarea = document.getElementById('titulo-livro');
+if(novoLivroTextarea) {
+  novoLivroTextarea.addEventListener('input', () => {
+    novoLivroTextarea.style.height = 'auto';
+    novoLivroTextarea.style.height = novoLivroTextarea.scrollHeight + 'px';
+  })
 }
 
 // Configura o botão "+"
@@ -1241,5 +1249,63 @@ document.addEventListener('DOMContentLoaded', function() {
         alert("Todos os livros foram apagados!");
       }
     });
+  }
+});
+
+// Lista de seções em ordem
+const secoes = ["metas", "prioridades", "checklist", "leitura", "reflexao"];
+let indiceAtual = 0;
+
+// Detecta qual seção está visível no início
+function detectarSecaoVisivel() {
+  secoes.forEach((id, index) => {
+    const sec = document.getElementById(id);
+    if (sec && sec.style.display !== "none") {
+      indiceAtual = index;
+    }
+  });
+}
+
+// Navega para a próxima ou anterior (direção: 1 ou -1)
+function navegarEntreSecoes(direcao) {
+  indiceAtual = (indiceAtual + direcao + secoes.length) % secoes.length;
+
+  // Atualiza visualmente
+  document.querySelectorAll('section').forEach(sec => {
+    sec.style.display = 'none';
+  });
+
+  const secaoAlvo = document.getElementById(secoes[indiceAtual]);
+  if (secaoAlvo) {
+    secaoAlvo.style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Atualiza a navbar
+  document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('ativo'));
+  const navAtivo = document.querySelector(`.nav-item[href="#${secoes[indiceAtual]}"]`);
+  if (navAtivo) navAtivo.classList.add('ativo');
+}
+
+// Detectar swipe
+let startX = 0;
+let endX = 0;
+
+document.addEventListener('touchstart', e => {
+  startX = e.changedTouches[0].screenX;
+});
+
+document.addEventListener('touchend', e => {
+  endX = e.changedTouches[0].screenX;
+  const diff = endX - startX;
+
+  detectarSecaoVisivel(); // garante que estamos na posição certa
+
+  if (Math.abs(diff) > 50) { // limite mínimo para considerar swipe
+    if (diff < 0) {
+      navegarEntreSecoes(1); // 👉 para esquerda = próxima seção
+    } else {
+      navegarEntreSecoes(-1); // 👈 para direita = seção anterior
+    }
   }
 });

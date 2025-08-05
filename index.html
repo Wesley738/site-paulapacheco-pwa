@@ -83,10 +83,10 @@
 
 
     <section id="metas">
-      <h1>📋 Metas</h1>
+      <h1>📋 Metas Gerais</h1>
 
       <div class="caixa-instrucoes">
-        <p>📌 <strong>Como usar:</strong> Defina metas para cada pilar e período. Clique na caixinha cinza quando concluir. Se quiser editar a atividade clique em ✏️. Se quiser apagar, clique em 🗑️</p>
+        <p>📌 <strong>Como usar:</strong> Defina metas para cada pilar e período. Clique na caixinha cinza quando concluir. Se quiser editar a meta clique em ✏️. Se quiser apagar, clique em 🗑️</p>
       </div>
       
       <!-- Formulário para adicionar nova meta -->
@@ -149,7 +149,7 @@
       <div class="caixa-instrucoes">
         <p>📌 <strong>Como usar:</strong> Defina prioridades, ou seja, atividades que não pode deixar de realizar no dia.
         Clique em ✅ para confirmar a prioridade. Para editar, clique em ✏️.
-        No Ato Heroico descreva uma atitude difícil que irá tomar, quer fazer algo ou deixar de fazer algo. No botão 💣 você pode limpar os relatórios e assim economizar armazenamento no seu dispositivo</p>
+        No Ato Heroico descreva uma atitude difícil que irá tomar, seja fazer algo, seja deixar de fazer algo. No botão 💣 você pode limpar os relatórios e assim economizar armazenamento no seu dispositivo</p>
       </div>
       <div class="prioridade-container">
           <!-- Prioridade 1 -->
@@ -212,7 +212,7 @@
       </div>
     </section>
     <section id="checklist" style="display: none;">
-      <h1>✅ Checklist</h1>
+      <h1>✅ Checklist Diário</h1>
       <div class="caixa-instrucoes">
         <p>📌 <strong>Como usar:</strong> Clique em "Adicionar Tarefa" para adicionar uma tarefa a ser realizada no dia. Há atividades de exemplo, mas pode editar ou apagar se quiser.
         Clique na caixinha cinza quando concluir. Se quiser editar a atividade clique em ✏️. Se quiser apagar, clique em 🗑️</p>
@@ -231,12 +231,12 @@
 
     <!-- Seção Reflexão -->
     <section id="reflexao">
-      <h1>💭 Reflexão</h1>
+      <h1>💭 Reflexão Diária</h1>
       <div class="caixa-instrucoes">
         <p>📌 <strong>Como usar:</strong> Lembre de coisas que gostaria de agradecer no dia. Abaixo, defina acertos e erros do dia.
         Quando preencher, clique em "✅ Concluído". Se quiser editar, clique em "✏️ Editar". 
         Quando terminar de preencher as caixas clique em "💯 Concluir Diagnóstico", então será gerado um diagnóstico do dia abaixo, onde pode sempre rever futuramente.
-      No botão 💣 você pode limpar os diagnósticos gerados e assim economizar armazenamento no seu dispositivo</p>
+      No botão 💣 você pode limpar todos os diagnósticos gerados e assim economizar armazenamento no seu dispositivo</p>
       </div>
       <div class="diagnostico-caixa">
         <div class="diagnostico-cabecalho">
@@ -280,15 +280,15 @@
     <section id="leitura" style="display: none;">
       <h1>📚 Leitura</h1>
       <div class="caixa-instrucoes">
-        <p>📌 <strong>Como usar:</strong> Adicione os livros que está lendo com as datas de início e meta de término. 
+        <p>📌 <strong>Como usar:</strong> Adicione livros, definindo a data que irá iniciar a leitura e a data que você pretende terminar a leitura deste livro, ou seja, uma meta.
         Quando terminar, preencha a data de conclusão para comparar com sua meta. Clique em ✏️ para editar ou 🗑️ para remover.
-      No botão 💣 você pode limpar os livros adicionados e assim economizar armazenamento no seu dispositivo</p>
+      No botão 💣 você pode limpar todos os livros adicionados e assim economizar armazenamento no seu dispositivo</p>
       </div>
       
       <!-- Formulário para adicionar novo livro -->
       <div class="adicionar-livro">
         <div class="grupo-leitura">
-          <input type="text" id="titulo-livro" placeholder="Título do Livro" class="input-livro">
+          <textarea id="titulo-livro" placeholder="Título do Livro" class="input-livro auto-ajuste" rows="1"></textarea>
           <div class="data-container">
             <input type="date" id="data-inicio" class="input-livro hoje">
             <span class="data-legenda">Data de início da leitura</span>
@@ -324,7 +324,7 @@
       <nav class="nav-inferior">
           <a href="#metas" class="nav-item">
               <span>📅</span>
-              <span class="nav-texto">Metas Gerais</span>
+              <span class="nav-texto">Metas</span>
           </a>
           <a href="#prioridades" class="nav-item">
               <span>🎯</span>
